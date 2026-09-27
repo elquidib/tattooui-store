@@ -145,6 +145,28 @@
     .search-box input{width:100%;margin-top:20px;background:transparent;border:0;border-bottom:1px solid #555;color:#fff;padding:15px 0;font-family:var(--serif);font-size:clamp(32px,6vw,60px);outline:0;text-align:center}
     .search-close{position:absolute;right:24px;top:22px;background:transparent;color:#fff;border:0;font-size:30px}
 
+    .product-page{display:none;min-height:calc(100vh - 112px);background:var(--paper)}
+    .product-page.active{display:block}
+    .product-detail{max-width:1320px;margin:auto;padding:70px 28px 100px}
+    .back-link{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:10px 0;margin-bottom:35px}
+    .detail-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(360px,.95fr);gap:70px;align-items:start}
+    .gallery-main{background:#e8e5de;aspect-ratio:1/1.08;overflow:hidden;display:grid;place-items:center}
+    .gallery-main img{width:100%;height:100%;object-fit:cover;display:block}
+    .gallery-thumbs{display:flex;gap:10px;margin-top:12px;overflow:auto}
+    .gallery-thumb{width:76px;height:88px;flex:0 0 auto;border:1px solid var(--line);background:#e8e5de;padding:0;overflow:hidden}
+    .gallery-thumb.active{border:2px solid var(--black)}
+    .gallery-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .detail-kicker{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);font-weight:700}
+    .detail-title{font-family:var(--serif);font-size:clamp(45px,6vw,78px);line-height:.98;margin:12px 0 18px;letter-spacing:-.03em}
+    .detail-price{font-size:20px;font-weight:800;margin-bottom:28px}
+    .detail-desc{font-size:14px;color:var(--muted);line-height:1.8;max-width:520px}
+    .detail-meta{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:30px 0}
+    .detail-meta div{padding:17px 0;font-size:11px;text-transform:uppercase;letter-spacing:.1em}.detail-meta div:nth-child(odd){border-right:1px solid var(--line);padding-right:18px}.detail-meta div:nth-child(even){padding-left:18px}
+    .qty-row{display:flex;gap:10px;margin-top:25px}.qty-control{display:flex;border:1px solid var(--black);height:54px}.qty-control button{width:48px;border:0;background:transparent;font-size:20px}.qty-control input{width:45px;border:0;background:transparent;text-align:center;outline:0;font-weight:700}.detail-add{flex:1;border:0;background:var(--black);color:#fff;height:54px;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+    .detail-buy-note{font-size:10px;color:var(--muted);margin-top:14px;line-height:1.6}
+    .detail-related{margin-top:90px;border-top:1px solid var(--line);padding-top:45px}.detail-related h3{font-family:var(--serif);font-size:35px;margin-bottom:25px}
+    @media(max-width:900px){.detail-grid{grid-template-columns:1fr;gap:40px}.product-detail{padding:45px 18px 75px}}
+    @media(max-width:560px){.detail-title{font-size:48px}.qty-row{flex-direction:column}.qty-control{width:100%;justify-content:center}.detail-add{width:100%}}
     .reveal{animation:rise .7s both}
     @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 
@@ -209,6 +231,8 @@
       <div class="products" id="products"></div>
     </section>
 
+    <section id="productPage" class="product-page" aria-live="polite"></section>
+
     <section id="story" class="manifesto">
       <div class="manifesto-inner">
         <div><div class="section-kicker">The TATTO’OUI idea</div><h2 class="section-title">Your style.<br>No commitment.</h2></div>
@@ -265,17 +289,20 @@
 
   <script>
     const PRODUCTS = [
-      {id:1,name:'Tribal Symbols',category:'symbol',meta:'Symbol · Black',price:99,image:'product-1.jpeg',badge:'FEATURED'},
-      {id:2,name:'Dragon Script',category:'dragon',meta:'Dragon · Black',price:99,image:'product-2.jpeg',badge:'NEW'},
-      {id:3,name:'Blessed Wings',category:'wings',meta:'Wings · Black',price:119,image:'product-3.jpeg',badge:'BESTSELLER'},
-      {id:4,name:'Gothic Numbers',category:'numbers',meta:'Numbers · Black',price:99,image:'product-4.jpeg',badge:''},
-      {id:5,name:'Gothic Script',category:'script',meta:'Script · Black',price:169,image:'product-5.jpeg',badge:'STATEMENT'}
+      {id:1,name:'Tribal Symbols',category:'symbol',meta:'Symbol · Black',price:99,image:'product-1.jpeg',badge:'FEATURED',desc:'Bold tribal-inspired temporary tattoo designs made for a strong, graphic look. Easy to wear, easy to change.',details:{Style:'Tribal',Color:'Black',Type:'Temporary tattoo',Delivery:'Morocco · COD'}},
+      {id:2,name:'Dragon Script',category:'dragon',meta:'Dragon · Black',price:99,image:'product-2.jpeg',badge:'NEW',desc:'A dramatic dragon-inspired script design for a darker, statement look.',details:{Style:'Dragon',Color:'Black',Type:'Temporary tattoo',Delivery:'Morocco · COD'}},
+      {id:3,name:'Blessed Wings',category:'wings',meta:'Wings · Black',price:119,image:'product-3.jpeg',badge:'BESTSELLER',desc:'Wing-inspired temporary tattoo designs with a bold black finish and a powerful visual presence.',details:{Style:'Wings',Color:'Black',Type:'Temporary tattoo',Delivery:'Morocco · COD'}},
+      {id:4,name:'Gothic Numbers',category:'numbers',meta:'Numbers · Black',price:99,image:'product-4.jpeg',badge:'',desc:'Gothic number designs for a clean but distinctive statement.',details:{Style:'Numbers',Color:'Black',Type:'Temporary tattoo',Delivery:'Morocco · COD'}},
+      {id:5,name:'Gothic Script',category:'script',meta:'Script · Black',price:169,image:'product-5.jpeg',badge:'STATEMENT',desc:'A collection of bold gothic calligraphy designs for a statement temporary tattoo look.',details:{Style:'Script',Color:'Black',Type:'Temporary tattoo',Delivery:'Morocco · COD'}}
     ];
     let cart=[];
+    let currentProduct=null;
 
     const productWrap=document.getElementById('products');
+    const productPage=document.getElementById('productPage');
+    const shopSection=document.getElementById('shop');
     function renderProducts(list=PRODUCTS){
-      productWrap.innerHTML=list.map(p=>`<article class="product" data-category="${p.category}"><button class="product-card" onclick="addToCart(${p.id})" aria-label="Add ${p.name} to cart"><span class="product-badge" style="display:${p.badge?'block':'none'}">${p.badge||''}</span><img class="product-art" src="${p.image}" alt="${p.name} temporary tattoo" loading="lazy"><span class="product-plus">+</span></button><div class="product-info"><div class="product-row"><div class="product-name">${p.name}</div><div class="price">${p.price} DH</div></div><div class="product-meta">${p.meta}</div></div></article>`).join('');
+      productWrap.innerHTML=list.map(p=>`<article class="product" data-category="${p.category}"><button class="product-card" onclick="openProduct(${p.id})" aria-label="View ${p.name}"><span class="product-badge" style="display:${p.badge?'block':'none'}">${p.badge||''}</span><img class="product-art" src="${p.image}" alt="${p.name} temporary tattoo" loading="lazy"><span class="product-plus">+</span></button><div class="product-info"><div class="product-row"><div class="product-name">${p.name}</div><div class="price">${p.price} DH</div></div><div class="product-meta">${p.meta}</div></div></article>`).join('');
     }
     renderProducts();
 
@@ -284,9 +311,51 @@
       const f=btn.dataset.filter;renderProducts(f==='all'?PRODUCTS:PRODUCTS.filter(p=>p.category===f));
     }));
 
-    function addToCart(id){
-      const p=PRODUCTS.find(x=>x.id===id);if(!p)return;cart.push(p);updateCart();openCart();
+    function openProduct(id, push=true){
+      const p=PRODUCTS.find(x=>x.id===id);if(!p)return;
+      currentProduct=p;
+      if(push) history.pushState({product:id},'',`#product-${id}`);
+      productPage.classList.add('active');
+      shopSection.style.display='none';
+      document.getElementById('story').style.display='none';
+      document.querySelectorAll('main > .section:not(#shop):not(#productPage), main > .final-cta').forEach(el=>el.style.display='none');
+      productPage.innerHTML=`
+        <div class="product-detail">
+          <button class="back-link" onclick="closeProduct()">← Back to collection</button>
+          <div class="detail-grid">
+            <div>
+              <div class="gallery-main"><img id="detailMainImage" src="${p.image}" alt="${p.name}"></div>
+              <div class="gallery-thumbs"><button class="gallery-thumb active"><img src="${p.image}" alt="${p.name}"></button></div>
+            </div>
+            <div class="detail-copy">
+              <div class="detail-kicker">${p.meta}</div>
+              <h1 class="detail-title">${p.name}</h1>
+              <div class="detail-price">${p.price} DH</div>
+              <p class="detail-desc">${p.desc}</p>
+              <div class="detail-meta">${Object.entries(p.details).map(([k,v])=>`<div><strong>${k}</strong><br>${v}</div>`).join('')}</div>
+              <div class="qty-row"><div class="qty-control"><button onclick="changeQty(-1)">−</button><input id="detailQty" value="1" min="1" type="number" readonly><button onclick="changeQty(1)">+</button></div><button class="detail-add" onclick="addCurrentToCart()">Add to cart · ${p.price} DH</button></div>
+              <div class="detail-buy-note">Cash on delivery in Morocco. Delivery details are confirmed with you before shipping.</div>
+            </div>
+          </div>
+          <div class="detail-related"><h3>You may also like.</h3><div class="products">${PRODUCTS.filter(x=>x.id!==p.id).slice(0,4).map(x=>`<article class="product"><button class="product-card" onclick="openProduct(${x.id})"><span class="product-badge" style="display:${x.badge?'block':'none'}">${x.badge||''}</span><img class="product-art" src="${x.image}" alt="${x.name}" loading="lazy"><span class="product-plus">+</span></button><div class="product-info"><div class="product-row"><div class="product-name">${x.name}</div><div class="price">${x.price} DH</div></div><div class="product-meta">${x.meta}</div></div></article>`).join('')}</div></div>
+        </div>`;
+      window.scrollTo({top:0,behavior:'smooth'});
     }
+    function closeProduct(push=true){
+      if(push) history.pushState({},'',location.pathname+location.search);
+      productPage.classList.remove('active');
+      shopSection.style.display='block';
+      document.getElementById('story').style.display='block';
+      document.querySelectorAll('main > .section:not(#shop):not(#productPage), main > .final-cta').forEach(el=>el.style.display='block');
+      window.scrollTo({top:shopSection.offsetTop-70,behavior:'smooth'});
+    }
+    function changeQty(delta){const input=document.getElementById('detailQty');if(input)input.value=Math.max(1,Number(input.value)+delta)}
+    function addCurrentToCart(){
+      const qty=Math.max(1,Number(document.getElementById('detailQty')?.value||1));
+      for(let i=0;i<qty;i++)cart.push(currentProduct);
+      updateCart();openCart();
+    }
+    function addToCart(id){const p=PRODUCTS.find(x=>x.id===id);if(!p)return;cart.push(p);updateCart();openCart()}
     function updateCart(){
       document.getElementById('navCount').textContent=cart.length;document.getElementById('floatCount').textContent=cart.length;
       const body=document.getElementById('cartBody');
@@ -306,9 +375,9 @@
     }
     function openSearch(){document.getElementById('searchOverlay').classList.add('open');document.body.classList.add('lock');setTimeout(()=>document.getElementById('searchInput').focus(),100)}
     function closeSearch(){document.getElementById('searchOverlay').classList.remove('open');document.body.classList.remove('lock')}
-    function searchProducts(q){
-      q=q.trim().toLowerCase();renderProducts(q?PRODUCTS.filter(p=>(p.name+' '+p.meta).toLowerCase().includes(q)):PRODUCTS);
-    }
+    function searchProducts(q){q=q.trim().toLowerCase();renderProducts(q?PRODUCTS.filter(p=>(p.name+' '+p.meta).toLowerCase().includes(q)):PRODUCTS)}
+    window.addEventListener('popstate',()=>{if(location.hash.startsWith('#product-'))openProduct(Number(location.hash.split('-')[1]),false);else if(currentProduct)closeProduct(false)});
+    if(location.hash.startsWith('#product-'))openProduct(Number(location.hash.split('-')[1]),false);
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSearch();closeCart()}});
   </script>
 </body>
