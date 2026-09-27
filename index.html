@@ -72,12 +72,12 @@
     .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:42px}
     .filter{background:transparent;border:1px solid var(--line);padding:10px 16px;border-radius:999px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;transition:.2s}
     .filter:hover,.filter.active{background:var(--black);color:#fff;border-color:var(--black)}
-    .products{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+    .products{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
     .product{min-width:0}
-    .product-card{background:#e8e5de;position:relative;overflow:hidden;aspect-ratio:4/5;display:block}
+    .product-card{background:#e8e5de;position:relative;overflow:hidden;aspect-ratio:4/5;display:block;width:100%;padding:0;border:0}
     .product-card:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.65),transparent 35%),linear-gradient(145deg,#efede7,#d6d2ca)}
-    .product-art{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--serif);font-size:92px;color:#111;z-index:1;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
-    .product:hover .product-art{transform:scale(1.07) rotate(-3deg)}
+    .product-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+    .product:hover .product-art{transform:scale(1.03)}
     .product-badge{position:absolute;left:12px;top:12px;background:#080808;color:#fff;padding:6px 9px;font-size:8px;font-weight:800;letter-spacing:.13em;z-index:2}
     .product-plus{position:absolute;right:12px;bottom:12px;width:38px;height:38px;border-radius:50%;background:#fff;z-index:2;display:grid;place-items:center;font-size:20px;box-shadow:0 8px 25px rgba(0,0,0,.12)}
     .product-info{padding:15px 1px 0}
@@ -200,10 +200,11 @@
       </div>
       <div class="filters" aria-label="Product filters">
         <button class="filter active" data-filter="all">All</button>
-        <button class="filter" data-filter="minimal">Minimal</button>
-        <button class="filter" data-filter="anime">Anime</button>
-        <button class="filter" data-filter="street">Street</button>
-        <button class="filter" data-filter="feminine">Feminine</button>
+        <button class="filter" data-filter="symbol">Symbols</button>
+        <button class="filter" data-filter="dragon">Dragon</button>
+        <button class="filter" data-filter="wings">Wings</button>
+        <button class="filter" data-filter="numbers">Numbers</button>
+        <button class="filter" data-filter="script">Script</button>
       </div>
       <div class="products" id="products"></div>
     </section>
@@ -264,20 +265,17 @@
 
   <script>
     const PRODUCTS = [
-      {id:1,name:'Star Spark',category:'minimal',meta:'Minimal · Black',price:29,art:'✦',badge:'BESTSELLER'},
-      {id:2,name:'Moon',category:'minimal',meta:'Minimal · Black',price:29,art:'☾',badge:'NEW'},
-      {id:3,name:'Ace',category:'street',meta:'Street · Black',price:29,art:'♠'},
-      {id:4,name:'Love',category:'feminine',meta:'Feminine · Black',price:29,art:'♡'},
-      {id:5,name:'Orbit',category:'minimal',meta:'Minimal · Black',price:29,art:'◌'},
-      {id:6,name:'Blade',category:'street',meta:'Street · Black',price:29,art:'✧'},
-      {id:7,name:'Manga Eye',category:'anime',meta:'Anime · Black',price:29,art:'◉'},
-      {id:8,name:'Angel',category:'feminine',meta:'Feminine · Black',price:29,art:'♢'}
+      {id:1,name:'Tribal Symbols',category:'symbol',meta:'Symbol · Black',price:99,image:'product-1.jpeg',badge:'FEATURED'},
+      {id:2,name:'Dragon Script',category:'dragon',meta:'Dragon · Black',price:99,image:'product-2.jpeg',badge:'NEW'},
+      {id:3,name:'Blessed Wings',category:'wings',meta:'Wings · Black',price:119,image:'product-3.jpeg',badge:'BESTSELLER'},
+      {id:4,name:'Gothic Numbers',category:'numbers',meta:'Numbers · Black',price:99,image:'product-4.jpeg',badge:''},
+      {id:5,name:'Gothic Script',category:'script',meta:'Script · Black',price:169,image:'product-5.jpeg',badge:'STATEMENT'}
     ];
     let cart=[];
 
     const productWrap=document.getElementById('products');
     function renderProducts(list=PRODUCTS){
-      productWrap.innerHTML=list.map(p=>`<article class="product" data-category="${p.category}"><button class="product-card" onclick="addToCart(${p.id})" aria-label="Add ${p.name} to cart"><span class="product-badge" style="display:${p.badge?'block':'none'}">${p.badge||''}</span><span class="product-art">${p.art}</span><span class="product-plus">+</span></button><div class="product-info"><div class="product-row"><div class="product-name">${p.name}</div><div class="price">${p.price} DH</div></div><div class="product-meta">${p.meta}</div></div></article>`).join('');
+      productWrap.innerHTML=list.map(p=>`<article class="product" data-category="${p.category}"><button class="product-card" onclick="addToCart(${p.id})" aria-label="Add ${p.name} to cart"><span class="product-badge" style="display:${p.badge?'block':'none'}">${p.badge||''}</span><img class="product-art" src="${p.image}" alt="${p.name} temporary tattoo" loading="lazy"><span class="product-plus">+</span></button><div class="product-info"><div class="product-row"><div class="product-name">${p.name}</div><div class="price">${p.price} DH</div></div><div class="product-meta">${p.meta}</div></div></article>`).join('');
     }
     renderProducts();
 
