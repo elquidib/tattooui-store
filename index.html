@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tattooui — tatouages temporaires au Maroc. Exprime ton style, change quand tu veux.">
+  <title>TATTOOUI — Tatouages temporaires</title>
+  <style>
+    :root{
+      --black:#080808;
+      --ink:#111111;
+      --white:#fff;
+      --soft:#f5f5f2;
+      --muted:#777;
+      --line:#e7e7e3;
+      --accent:#d9d9d4;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--white);
+      color:var(--ink);
+      line-height:1.45;
+      -webkit-font-smoothing:antialiased;
+    }
+    a{text-decoration:none;color:inherit}
+    button{font:inherit}
+    .announcement{
+      background:var(--black);color:white;text-align:center;
+      font-size:12px;letter-spacing:.08em;padding:9px 12px;
+    }
+    header{
+      position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);
+      backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+    }
+    .nav{
+      max-width:1200px;margin:auto;height:72px;padding:0 22px;
+      display:flex;align-items:center;justify-content:space-between;gap:20px;
+    }
+    .brand{
+      font-family:Georgia,'Times New Roman',serif;font-size:27px;
+      font-weight:800;letter-spacing:.12em;
+    }
+    .brand span{display:inline-block}
+    .spark{font-family:Arial,sans-serif;font-size:20px;vertical-align:7px;margin-left:2px}
+    .links{display:flex;gap:28px;font-size:13px;font-weight:600}
+    .links a:hover{text-decoration:underline}
+    .icons{display:flex;gap:10px;align-items:center}
+    .iconbtn{
+      border:0;background:transparent;cursor:pointer;font-size:21px;
+      width:38px;height:38px;border-radius:50%;
+    }
+    .iconbtn:hover{background:var(--soft)}
+    .hero{
+      min-height:650px;background:#080808;color:#fff;display:grid;
+      place-items:center;position:relative;overflow:hidden;
+    }
+    .hero:before,.hero:after{
+      content:"✦";position:absolute;color:#fff;opacity:.12;font-size:180px;
+    }
+    .hero:before{left:-30px;top:80px}.hero:after{right:10px;bottom:-50px;font-size:260px}
+    .hero-inner{width:min(900px,92%);text-align:center;position:relative;z-index:2;padding:70px 0}
+    .eyebrow{font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:#aaa;margin-bottom:24px}
+    .hero h1{
+      font-family:Georgia,'Times New Roman',serif;font-size:clamp(58px,11vw,128px);
+      line-height:.88;letter-spacing:.08em;margin-bottom:25px;
+    }
+    .hero h1 .star{font-family:Arial;font-size:.55em;vertical-align:top}
+    .hero p{max-width:520px;margin:0 auto 32px;color:#cfcfcf;font-size:16px}
+    .cta{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      background:#fff;color:#000;padding:15px 26px;border-radius:2px;
+      font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+      transition:.2s;
+    }
+    .cta:hover{transform:translateY(-2px)}
+    .section{max-width:1200px;margin:auto;padding:76px 22px}
+    .section-head{text-align:center;margin-bottom:36px}
+    .section-head .mini{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#777}
+    .section-head h2{font-family:Georgia,serif;font-size:38px;margin:9px 0}
+    .section-head p{color:#777;font-size:14px}
+    .chips{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-bottom:35px}
+    .chip{border:1px solid #ddd;background:#fff;padding:9px 16px;border-radius:99px;font-size:12px;cursor:pointer}
+    .chip.active,.chip:hover{background:#000;color:#fff;border-color:#000}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+    .product{position:relative}
+    .product-img{
+      aspect-ratio:1/1;background:linear-gradient(145deg,#f7f7f5,#deded9);
+      display:grid;place-items:center;overflow:hidden;position:relative;
+    }
+    .product-img:after{
+      content:"✦";font-size:92px;color:#111;opacity:.12;
+      position:absolute;transform:rotate(-12deg);
+    }
+    .tattoo-preview{
+      width:54%;height:54%;display:grid;place-items:center;z-index:1;
+      font-family:Georgia,serif;font-size:52px;color:#111;transform:rotate(-8deg);
+    }
+    .badge{position:absolute;top:12px;left:12px;background:#000;color:#fff;padding:5px 8px;font-size:9px;letter-spacing:.1em;z-index:2}
+    .product-info{padding:12px 2px}
+    .product-name{font-size:14px;font-weight:700}
+    .product-sub{font-size:12px;color:#888;margin-top:3px}
+    .price{font-weight:800;margin-top:8px}
+    .why{background:var(--soft)}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+    .feature{background:#fff;padding:30px;text-align:center}
+    .feature .ficon{font-size:28px;margin-bottom:14px}
+    .feature h3{font-family:Georgia,serif;font-size:20px;margin-bottom:7px}
+    .feature p{font-size:13px;color:#777}
+    .how{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+    .step{border-top:1px solid #111;padding-top:20px}
+    .step-num{font-size:11px;letter-spacing:.2em;color:#777}
+    .step h3{font-family:Georgia,serif;font-size:22px;margin:8px 0}
+    .step p{font-size:13px;color:#777}
+    .newsletter{background:#080808;color:#fff;text-align:center}
+    .newsletter p{color:#aaa;max-width:500px;margin:10px auto 25px;font-size:14px}
+    .wa{
+      display:inline-flex;background:#fff;color:#000;padding:14px 22px;
+      font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    }
+    footer{background:#080808;color:#aaa;border-top:1px solid #222;padding:30px 22px}
+    .footer-inner{max-width:1200px;margin:auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:11px}
+    .cart{
+      position:fixed;right:20px;bottom:20px;background:#000;color:#fff;
+      border:0;border-radius:50%;width:58px;height:58px;z-index:80;
+      box-shadow:0 10px 30px #0003;cursor:pointer;font-size:21px;
+    }
+    .cart-count{
+      position:absolute;right:-2px;top:-2px;background:#fff;color:#000;
+      width:19px;height:19px;border-radius:50%;font-size:10px;display:grid;place-items:center;font-weight:bold;
+    }
+    @media(max-width:850px){
+      .links{display:none}
+      .grid{grid-template-columns:repeat(2,1fr)}
+      .features,.how{grid-template-columns:1fr}
+      .hero{min-height:570px}
+    }
+    @media(max-width:480px){
+      .nav{height:62px}
+      .brand{font-size:22px}
+      .grid{gap:12px}
+      .section{padding:58px 16px}
+      .section-head h2{font-size:31px}
+      .hero h1{font-size:62px}
+      .hero p{font-size:14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="announcement">🇲🇦 LIVRAISON PARTOUT AU MAROC • PAIEMENT À LA LIVRAISON</div>
+
+  <header>
+    <nav class="nav">
+      <a href="#" class="brand">TATTOOUI <span class="spark">✦</span></a>
+      <div class="links">
+        <a href="#shop">TATTOOS</a>
+        <a href="#why">POURQUOI NOUS</a>
+        <a href="#how">COMMENT ÇA MARCHE</a>
+      </div>
+      <div class="icons">
+        <button class="iconbtn" aria-label="Recherche">⌕</button>
+        <button class="iconbtn" aria-label="Panier" onclick="showCart()">🛒</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="eyebrow">Temporary tattoos • Morocco</div>
+        <h1>TATTOO<span class="star">✦</span>UI</h1>
+        <p>Exprime ton style. Change quand tu veux. Des tatouages temporaires pensés pour compléter ton look.</p>
+        <a class="cta" href="#shop">Découvrir la collection →</a>
+      </div>
+    </section>
+
+    <section id="shop" class="section">
+      <div class="section-head">
+        <div class="mini">La collection</div>
+        <h2>Choisis ton style.</h2>
+        <p>Des designs pour chaque mood, chaque outfit et chaque moment.</p>
+      </div>
+
+      <div class="chips">
+        <button class="chip active">Tous</button>
+        <button class="chip">Minimal</button>
+        <button class="chip">Anime</button>
+        <button class="chip">Street</button>
+        <button class="chip">Féminin</button>
+      </div>
+
+      <div class="grid">
+        <article class="product">
+          <div class="product-img"><span class="badge">BESTSELLER</span><div class="tattoo-preview">✦</div></div>
+          <div class="product-info"><div class="product-name">Star Spark</div><div class="product-sub">Minimal • Noir</div><div class="price">29 DH</div></div>
+        </article>
+        <article class="product">
+          <div class="product-img"><span class="badge">NEW</span><div class="tattoo-preview">☾</div></div>
+          <div class="product-info"><div class="product-name">Moon</div><div class="product-sub">Minimal • Noir</div><div class="price">29 DH</div></div>
+        </article>
+        <article class="product">
+          <div class="product-img"><div class="tattoo-preview">♠</div></div>
+          <div class="product-info"><div class="product-name">Ace</div><div class="product-sub">Street • Noir</div><div class="price">29 DH</div></div>
+        </article>
+        <article class="product">
+          <div class="product-img"><div class="tattoo-preview">♡</div></div>
+          <div class="product-info"><div class="product-name">Love</div><div class="product-sub">Féminin • Noir</div><div class="price">29 DH</div></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="why" class="why">
+      <div class="section">
+        <div class="section-head">
+          <div class="mini">Tattooui</div>
+          <h2>Ton style. Sans engagement.</h2>
+        </div>
+        <div class="features">
+          <div class="feature"><div class="ficon">✦</div><h3>Facile à appliquer</h3><p>Quelques secondes suffisent pour ton nouveau look.</p></div>
+          <div class="feature"><div class="ficon">◌</div><h3>Change quand tu veux</h3><p>Teste de nouveaux designs sans engagement permanent.</p></div>
+          <div class="feature"><div class="ficon">🇲🇦</div><h3>Livraison au Maroc</h3><p>Commande simplement avec paiement à la livraison.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="section">
+      <div class="section-head">
+        <div class="mini">Simple comme ça</div>
+        <h2>Comment ça marche ?</h2>
+      </div>
+      <div class="how">
+        <div class="step"><div class="step-num">01 — CHOISIS</div><h3>Ton tattoo</h3><p>Choisis le design qui correspond à ton mood.</p></div>
+        <div class="step"><div class="step-num">02 — COMMANDE</div><h3>On prépare</h3><p>Entre tes informations et commande avec paiement à la livraison.</p></div>
+        <div class="step"><div class="step-num">03 — PROFITE</div><h3>Porte-le</h3><p>Applique ton tattoo et complète ton look.</p></div>
+      </div>
+    </section>
+
+    <section class="newsletter">
+      <div class="section">
+        <div class="section-head">
+          <div class="mini" style="color:#777">TATTOOUI</div>
+          <h2>Prêt à changer de style ?</h2>
+          <p>Découvre nos nouveaux designs sur Instagram.</p>
+          <a class="wa" href="https://instagram.com/tattooui" target="_blank" rel="noopener">Voir Instagram →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button class="cart" onclick="showCart()" aria-label="Panier">🛒<span class="cart-count" id="count">0</span></button>
+
+  <footer>
+    <div class="footer-inner">
+      <div>© 2026 TATTOOUI</div>
+      <div>Tatouages temporaires • Maroc</div>
+      <div>Instagram · WhatsApp</div>
+    </div>
+  </footer>
+
+  <script>
+    let cart = 0;
+    document.querySelectorAll('.chip').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.chip').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+    function showCart(){
+      alert(cart ? `Ton panier contient ${cart} article(s). Le checkout COD sera ajouté à l'étape suivante.` : 'Ton panier est vide.');
+    }
+  </script>
+</body>
+</html>
