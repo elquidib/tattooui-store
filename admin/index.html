@@ -57,8 +57,9 @@ label{display:block;font-weight:700;margin-top:10px}input,textarea,select{width:
 <div class="formgrid"><div><label>Color</label><input id="pColor" placeholder="Black"></div><div><label>Tags</label><input id="pTags" placeholder="dragon, black, script"></div></div>
 <label>Product images</label>
 <input id="pImageFiles" type="file" accept="image/*" multiple>
-<p class="muted" style="margin:6px 0">Choose one or more photos. They upload securely to your store when you save.</p>
+<p class="muted" style="margin:6px 0">Select multiple photos at once, or click again to keep adding more.</p>
 <div id="imagePreview" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"></div>
+<button type="button" class="secondary" onclick="document.getElementById('pImageFiles').click()">+ Add more images</button>
 <label>Image URLs <span class="muted">(optional fallback, one per line)</span></label><textarea id="pImages" placeholder="https://..."></textarea>
 <div class="checkrow"><label><input id="pFeatured" type="checkbox"> Featured</label><label><input id="pBestseller" type="checkbox"> Bestseller</label></div>
 <label>SEO title</label><input id="pSeoTitle"><label>SEO description</label><textarea id="pSeoDescription"></textarea>
@@ -89,11 +90,13 @@ async function loadAll(){await Promise.all([loadProducts(),loadCollections(),loa
 async function loadStats(){const a=await Promise.all(['products','orders','reviews'].map(t=>db.from(t).select('*',{count:'exact',head:true})));$('statProducts').textContent=a[0].count??0;$('statOrders').textContent=a[1].count??0;$('statReviews').textContent=a[2].count??0}
 async function loadProducts(){const r=await db.from('products').select('*').order('created_at',{ascending:false});if(r.error){alert(r.error.message);return}products=r.data||[];renderProducts()}
 function renderProducts(){const q=$('search').value.toLowerCase(),st=$('statusFilter').value;const rows=products.filter(p=>(!q||[p.name,p.slug,p.sku,p.description].join(' ').toLowerCase().includes(q))&&(!st||p.status===st));$('productRows').innerHTML=rows.length?rows.map(p=>`<tr><td><div style="display:flex;gap:10px;align-items:center"><img class="thumb" src="${esc((p.image_urls||[])[0]||'')}"><div><b>${esc(p.name)}</b><div class="muted">${esc(p.slug)}</div></div></div></td><td>${num(p.price)} DH</td><td>${p.stock}</td><td><span class="badge">${esc(p.status)}</span></td><td>${p.featured?'Featured ':''}${p.bestseller?'Bestseller':''}</td><td><button onclick="editProduct('${p.id}')">Edit</button></td></tr>`).join(''):`<tr><td colspan="6" class="empty">No products yet. Click “Add product”.</td></tr>`}
-function newProduct(){$('productId').value='';$('editorTitle').textContent='Add product';$('productForm').reset();$('pStock').value=0;$('deleteBtn').classList.add('hidden');$('formMessage').textContent='';$('imagePreview').innerHTML=''}
-function previewFiles(){const files=[...$('pImageFiles').files];$('imagePreview').innerHTML=files.map(f=>{const u=URL.createObjectURL(f);return '<img class="thumb" title="'+esc(f.name)+'" src="'+u+'">'}).join('')}
-$('pImageFiles').addEventListener('change',previewFiles);
+function newProduct(){$('productId').value='';$('editorTitle').textContent='Add product';$('productForm').reset();$('pStock').value=0;$('deleteBtn').classList.add('hidden');$('formMessage').textContent='';selectedImageFiles=[];$('imagePreview').innerHTML=''}
+let selectedImageFiles=[];
+function renderSelectedImages(){$('imagePreview').innerHTML=selectedImageFiles.map((f,i)=>{const u=URL.createObjectURL(f);return '<div style="position:relative"><img class="thumb" title="'+esc(f.name)+'" src="'+u+'"><button type="button" onclick="removeSelectedImage('+i+')" style="position:absolute;right:-5px;top:-5px;padding:2px 7px;border-radius:99px">×</button></div>'}).join('')}
+function removeSelectedImage(i){selectedImageFiles.splice(i,1);renderSelectedImages()}
+$('pImageFiles').addEventListener('change',e=>{selectedImageFiles=[...selectedImageFiles,...e.target.files];renderSelectedImages();e.target.value=''});
 async function uploadImages(productId){
- const files=[...$('pImageFiles').files]; if(!files.length)return [];
+ const files=[...selectedImageFiles]; if(!files.length)return [];
  const urls=[];
  for(const file of files){
    const safe=file.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-');
