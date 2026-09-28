@@ -9,7 +9,14 @@
 <meta property="og:title" content="TATTOUI — Temporary Tattoos">
 <meta property="og:description" content="Temporary tattoos made for your mood. Cash on delivery across Morocco.">
 <meta property="og:type" content="website">
-<title>TATTOUI — Temporary Tattoos</title>
+<meta property="og:site_name" content="TATTOOUI">
+<meta property="og:locale" content="en_MA">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TATTOOUI — Temporary Tattoos">
+<meta name="twitter:description" content="Temporary tattoos made for your mood. Cash on delivery across Morocco.">
+<link rel="canonical" href="https://tattooui-store.pages.dev/">
+<script type="application/ld+json" id="storeStructuredData"></script>
+<title>TATTOOUI — Temporary Tattoos</title>
 <script src="/turnstile-config.js"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=tattoouiTurnstileLoaded" async defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -179,7 +186,22 @@ function openModal(src){document.getElementById("modalImg").src=src;document.get
 function closeModal(){document.getElementById("imageModal").classList.remove("open")}
 function toast(t){const x=document.getElementById("toast");x.textContent=t;x.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.classList.remove("show"),2200)}
 function render(){const path=location.hash.replace(/^#/,"")||"/";let app=document.getElementById("app");if(path.startsWith("/product/")){const p=products.find(x=>x.id===Number(path.split("/")[2]));app.innerHTML=p?productView(p):homeView()}else if(path==="/checkout"){app.innerHTML=checkoutView()}else if(path.startsWith("/order-confirmed/")){app.innerHTML=confirmationView(path.split("/")[2]||"")}else app.innerHTML=homeView();updateBadge();renderCart()}
-window.addEventListener("hashchange",()=>{resetTurnstile();render();setTimeout(renderTurnstile,150)});window.addEventListener("scroll",()=>document.getElementById("backtop").classList.toggle("show",scrollY>600));render();syncStorefrontProductImages();setTimeout(renderTurnstile,500);
+function updateSEO(){
+  const path=location.hash.replace(/^#/,"")||"/";
+  const base="https://tattooui-store.pages.dev";
+  const p=path.startsWith("/product/")?products.find(x=>x.id===Number(path.split("/")[2])):null;
+  const title=p?(String(p.name)+" — TATTOOUI"):"TATTOOUI — Temporary Tattoos";
+  const desc=p?String(p.desc||"Temporary tattoo design.").slice(0,155):"Premium temporary tattoos in Morocco. Express your style. Cash on delivery across Morocco.";
+  document.title=title;
+  const setMeta=(selector,attrs,value)=>{let el=document.querySelector(selector);if(!el){el=document.createElement("meta");Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));document.head.appendChild(el)}el.setAttribute("content",value)};
+  setMeta('meta[name="description"]',{name:"description"},desc);
+  setMeta('meta[property="og:title"]',{property:"og:title"},title);
+  setMeta('meta[property="og:description"]',{property:"og:description"},desc);
+  let link=document.querySelector('link[rel="canonical"]');if(!link){link=document.createElement("link");link.rel="canonical";document.head.appendChild(link)}
+  link.href=base+(p?"/#/product/"+p.id:"/");
+  const schema=document.getElementById("storeStructuredData");
+  if(schema){const data=p?{"@context":"https://schema.org","@type":"Product","name":p.name,"description":desc,"image":(p.images||[]).map(x=>x.src).filter(Boolean),"brand":{"@type":"Brand","name":"TATTOOUI"},"offers":{"@type":"Offer","priceCurrency":"MAD","price":Number(p.price),"availability":Number(p.stock)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock","url":base+"/#/product/"+p.id}}:{"@context":"https://schema.org","@type":"WebSite","name":"TATTOOUI","url":base+"/","description":desc};schema.textContent=JSON.stringify(data)}
+}window.addEventListener("hashchange",()=>{resetTurnstile();render();updateSEO();setTimeout(renderTurnstile,150)});window.addEventListener("scroll",()=>document.getElementById("backtop").classList.toggle("show",scrollY>600));render();syncStorefrontProductImages();updateSEO();setTimeout(renderTurnstile,500);
 </script>
 </body>
 </html>
