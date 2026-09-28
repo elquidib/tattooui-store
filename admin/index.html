@@ -77,6 +77,19 @@ label{display:block;font-weight:700;margin-top:10px}input,textarea,select{width:
 <div class="section-title">Search engine optimization</div><label>SEO title</label><input id="cSeoTitle"><label>SEO description</label><textarea id="cSeoDescription"></textarea>
 <div class="savebar"><div class="actions"><button>Save collection</button><button type="button" class="secondary" onclick="newCollection()">Clear</button><button id="deleteCollectionBtn" type="button" class="danger hidden" onclick="deleteCollection()">Delete</button></div></div><p id="collectionMessage"></p></form></div>
 </div></section>
+<section id="ordersTab" class="hidden">
+<div class="hint">Manage your COD orders from one place. Update the status after each step and contact customers directly on WhatsApp.</div>
+<div class="stats" style="margin-bottom:16px;grid-template-columns:repeat(4,1fr)">
+<div class="stat">New<b id="orderStatNew">0</b></div><div class="stat">Confirmed<b id="orderStatConfirmed">0</b></div><div class="stat">Shipped<b id="orderStatShipped">0</b></div><div class="stat">Delivered<b id="orderStatDelivered">0</b></div>
+</div>
+<div class="layout">
+<div class="card">
+<div class="toolbar"><input id="orderSearch" placeholder="Search order, name, phone, city..." oninput="renderOrders()"><select id="orderStatusFilter" onchange="renderOrders()"><option value="">All statuses</option><option>new</option><option>confirmed</option><option>processing</option><option>shipped</option><option>delivered</option><option>cancelled</option><option>returned</option></select><button class="secondary" onclick="loadOrders()">Refresh</button></div>
+<div class="tablewrap"><table class="table" style="min-width:850px"><thead><tr><th>Order</th><th>Customer</th><th>City</th><th>Total</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody id="orderRows"></tbody></table></div>
+</div>
+<div class="card editor-card" id="orderEditor"><h2 id="orderTitle">Select an order</h2><p id="orderHint" class="muted">Choose an order to see customer details, products and actions.</p><div id="orderDetail" class="hidden"></div></div>
+</div>
+</section>
 </div>
 
 <script>
