@@ -1,1 +1,107 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TATTOOUI Admin</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="../supabase-config.js"></script><style>body{margin:0;background:#f5f3ee;color:#111;font:14px system-ui}.wrap{max-width:1100px;margin:auto;padding:30px}.card{background:white;border:1px solid #ddd8cf;border-radius:16px;padding:24px;margin:15px 0}input,textarea,select{width:100%;box-sizing:border-box;padding:11px;border:1px solid #ddd8cf;border-radius:9px;margin:6px 0 14px}button{padding:11px 16px;border:0;border-radius:9px;background:#111;color:white;font-weight:700;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{padding:18px;background:#fff;border:1px solid #ddd8cf;border-radius:12px}.muted{color:#777}.hidden{display:none}@media(max-width:700px){.grid{grid-template-columns:1fr}.wrap{padding:16px}}</style></head><body><div id="login" class="wrap"><div class="card"><h1>TATTOOUI</h1><p class="muted">Admin dashboard</p><form id="loginForm"><label>Email</label><input id="email" type="email" required><label>Password</label><input id="password" type="password" required><button>Sign in</button><p id="error"></p></form></div></div><div id="app" class="wrap hidden"><div class="card"><h1>TATTOOUI Admin</h1><button onclick="logout()">Log out</button></div><div class="grid"><div class="stat">Products<h2 id="products">—</h2></div><div class="stat">Orders<h2 id="orders">—</h2></div><div class="stat">Reviews<h2 id="reviews">—</h2></div></div><div class="card"><h2>Products</h2><p class="muted">The full product editor is the next module. The connection to your live database is already working.</p><button onclick="loadStats()">Refresh</button></div></div><script>const db=supabase.createClient(TATTOOUI_SUPABASE.url,TATTOOUI_SUPABASE.publishableKey);async function isAdmin(){const u=await db.auth.getUser();if(!u.data.user)return false;const r=await db.from("profiles").select("role").eq("id",u.data.user.id).maybeSingle();return r.data?.role==="admin"}async function loadStats(){const a=await Promise.all(["products","orders","reviews"].map(t=>db.from(t).select("*",{count:"exact",head:true})));document.getElementById("products").textContent=a[0].count??0;document.getElementById("orders").textContent=a[1].count??0;document.getElementById("reviews").textContent=a[2].count??0}async function start(){if(await isAdmin()){login.classList.add("hidden");app.classList.remove("hidden");loadStats()}}loginForm.onsubmit=async e=>{e.preventDefault();error.textContent="";const r=await db.auth.signInWithPassword({email:email.value,password:password.value});if(r.error){error.textContent=r.error.message;return}if(!(await isAdmin())){await db.auth.signOut();error.textContent="This account is not an admin.";return}start()};async function logout(){await db.auth.signOut();location.reload()}start();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TATTOOUI Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../supabase-config.js"></script>
+<style>
+:root{--bg:#f5f3ee;--card:#fff;--ink:#151515;--muted:#77736c;--line:#e3dfd7;--accent:#111}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit}button{border:0;border-radius:10px;padding:10px 15px;background:#111;color:#fff;font-weight:700;cursor:pointer}button.secondary{background:#eeeae3;color:#111}button.danger{background:#b42318}button:disabled{opacity:.5;cursor:not-allowed}
+.wrap{max-width:1250px;margin:auto;padding:24px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 2px 12px #00000006}
+.login{max-width:460px;margin:10vh auto}.muted{color:var(--muted)}.error{color:#b42318}.success{color:#18794e}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px}.top h1{margin:0}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{padding:18px;border:1px solid var(--line);border-radius:12px;background:#fff}.stat b{display:block;font-size:25px;margin-top:7px}
+.layout{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar input{max-width:330px}
+label{display:block;font-weight:700;margin-top:10px}input,textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:#111}textarea{min-height:90px;resize:vertical}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.checkrow{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0}.checkrow label{display:flex;align-items:center;gap:7px;margin:0;font-weight:600}.checkrow input{width:auto}
+.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:720px}.table th,.table td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}.table th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}.thumb{width:54px;height:54px;border-radius:9px;object-fit:cover;background:#eee}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#eeeae3;font-size:12px}.empty{text-align:center;padding:35px;color:var(--muted)}
+.tabs{display:flex;gap:8px;margin-bottom:16px;overflow:auto}.tab{white-space:nowrap;background:#eeeae3;color:#111}.tab.active{background:#111;color:#fff}
+.hidden{display:none!important}.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}.modalbox{width:min(720px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;padding:24px}.modalhead{display:flex;justify-content:space-between;align-items:center}.modalhead h2{margin:0}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.wrap{padding:14px}.formgrid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="login" class="wrap login"><div class="card">
+<h1>TATTOOUI</h1><p class="muted">Store admin</p>
+<form id="loginForm"><label>Email</label><input id="email" type="email" required autocomplete="username"><label>Password</label><input id="password" type="password" required autocomplete="current-password"><button>Sign in</button><p id="loginError" class="error"></p></form>
+</div></div>
+
+<div id="app" class="wrap hidden">
+<div class="card top"><div><h1>TATTOOUI Admin</h1><p id="adminEmail" class="muted"></p></div><div class="actions"><button class="secondary" onclick="loadAll()">Refresh</button><button onclick="logout()">Log out</button></div></div>
+<div class="stats">
+<div class="stat">Products<b id="statProducts">0</b></div><div class="stat">Orders<b id="statOrders">0</b></div><div class="stat">Reviews<b id="statReviews">0</b></div>
+</div>
+<div class="tabs">
+<button class="tab active" data-tab="productsTab" onclick="showTab('productsTab',this)">Products</button>
+<button class="tab" data-tab="collectionsTab" onclick="showTab('collectionsTab',this)">Collections</button>
+</div>
+
+<section id="productsTab">
+<div class="layout">
+<div class="card">
+<div class="toolbar"><input id="search" placeholder="Search products..." oninput="renderProducts()"><select id="statusFilter" onchange="renderProducts()"><option value="">All statuses</option><option>active</option><option>draft</option><option>archived</option></select><button onclick="newProduct()">+ Add product</button></div>
+<div class="tablewrap"><table class="table"><thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Status</th><th>Flags</th><th></th></tr></thead><tbody id="productRows"></tbody></table></div>
+</div>
+<div class="card">
+<h2 id="editorTitle">Add product</h2><p class="muted">Changes save directly to your Supabase database.</p>
+<form id="productForm">
+<input type="hidden" id="productId">
+<div class="formgrid"><div><label>Name</label><input id="pName" required></div><div><label>Slug</label><input id="pSlug" required></div></div>
+<label>Description</label><textarea id="pDescription"></textarea>
+<div class="formgrid"><div><label>Price (DH)</label><input id="pPrice" type="number" min="0" step="0.01" required></div><div><label>Compare-at price (DH)</label><input id="pCompare" type="number" min="0" step="0.01"></div></div>
+<div class="formgrid"><div><label>SKU</label><input id="pSku"></div><div><label>Stock</label><input id="pStock" type="number" min="0" step="1" value="0"></div></div>
+<div class="formgrid"><div><label>Status</label><select id="pStatus"><option>active</option><option>draft</option><option>archived</option></select></div><div><label>Badge</label><input id="pBadge" placeholder="New, Bestseller..."></div></div>
+<div class="formgrid"><div><label>Color</label><input id="pColor" placeholder="Black"></div><div><label>Tags</label><input id="pTags" placeholder="dragon, black, script"></div></div>
+<label>Image URLs <span class="muted">(one per line)</span></label><textarea id="pImages" placeholder="https://..."></textarea>
+<div class="checkrow"><label><input id="pFeatured" type="checkbox"> Featured</label><label><input id="pBestseller" type="checkbox"> Bestseller</label></div>
+<label>SEO title</label><input id="pSeoTitle"><label>SEO description</label><textarea id="pSeoDescription"></textarea>
+<div class="actions" style="margin-top:14px"><button type="submit">Save product</button><button type="button" class="secondary" onclick="newProduct()">Clear</button><button id="deleteBtn" type="button" class="danger hidden" onclick="deleteProduct()">Delete</button></div>
+<p id="formMessage"></p>
+</form>
+</div>
+</div>
+</section>
+
+<section id="collectionsTab" class="hidden">
+<div class="layout">
+<div class="card"><div class="toolbar"><button onclick="newCollection()">+ Add collection</button></div><div class="tablewrap"><table class="table"><thead><tr><th>Name</th><th>Slug</th><th>Status</th><th>Order</th><th></th></tr></thead><tbody id="collectionRows"></tbody></table></div></div>
+<div class="card"><h2 id="collectionTitle">Add collection</h2><form id="collectionForm"><input type="hidden" id="collectionId"><label>Name</label><input id="cName" required><label>Slug</label><input id="cSlug" required><label>Description</label><textarea id="cDescription"></textarea><label>Image URL</label><input id="cImage"><div class="formgrid"><div><label>Status</label><select id="cStatus"><option>active</option><option>draft</option></select></div><div><label>Sort order</label><input id="cSort" type="number" value="0"></div></div><label>SEO title</label><input id="cSeoTitle"><label>SEO description</label><textarea id="cSeoDescription"></textarea><div class="actions" style="margin-top:14px"><button>Save collection</button><button type="button" class="secondary" onclick="newCollection()">Clear</button><button id="deleteCollectionBtn" type="button" class="danger hidden" onclick="deleteCollection()">Delete</button></div><p id="collectionMessage"></p></form></div>
+</div>
+</section>
+</div>
+
+<script>
+const db=supabase.createClient(TATTOOUI_SUPABASE.url,TATTOOUI_SUPABASE.publishableKey);
+let products=[],collections=[];
+const $=id=>document.getElementById(id);
+const slugify=s=>String(s||'').toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');
+async function isAdmin(){const u=await db.auth.getUser();if(!u.data.user)return null;const r=await db.from('profiles').select('role').eq('id',u.data.user.id).maybeSingle();return r.data?.role==='admin'?u.data.user:null}
+async function start(){const u=await isAdmin();if(!u)return;$('login').classList.add('hidden');$('app').classList.remove('hidden');$('adminEmail').textContent=u.email||'';loadAll()}
+$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';const r=await db.auth.signInWithPassword({email:$('email').value,password:$('password').value});if(r.error){$('loginError').textContent=r.error.message;return}if(!(await isAdmin())){await db.auth.signOut();$('loginError').textContent='This account is not an admin.';return}start()};
+async function loadAll(){await Promise.all([loadProducts(),loadCollections(),loadStats()])}
+async function loadStats(){const a=await Promise.all(['products','orders','reviews'].map(t=>db.from(t).select('*',{count:'exact',head:true})));$('statProducts').textContent=a[0].count??0;$('statOrders').textContent=a[1].count??0;$('statReviews').textContent=a[2].count??0}
+async function loadProducts(){const r=await db.from('products').select('*').order('created_at',{ascending:false});if(r.error){alert(r.error.message);return}products=r.data||[];renderProducts()}
+function renderProducts(){const q=$('search').value.toLowerCase(),st=$('statusFilter').value;const rows=products.filter(p=>(!q||[p.name,p.slug,p.sku,p.description].join(' ').toLowerCase().includes(q))&&(!st||p.status===st));$('productRows').innerHTML=rows.length?rows.map(p=>`<tr><td><div style="display:flex;gap:10px;align-items:center"><img class="thumb" src="${esc((p.image_urls||[])[0]||'')}"><div><b>${esc(p.name)}</b><div class="muted">${esc(p.slug)}</div></div></div></td><td>${num(p.price)} DH</td><td>${p.stock}</td><td><span class="badge">${esc(p.status)}</span></td><td>${p.featured?'Featured ':''}${p.bestseller?'Bestseller':''}</td><td><button onclick="editProduct('${p.id}')">Edit</button></td></tr>`).join(''):`<tr><td colspan="6" class="empty">No products yet. Click “Add product”.</td></tr>`}
+function newProduct(){$('productId').value='';$('editorTitle').textContent='Add product';$('productForm').reset();$('pStock').value=0;$('deleteBtn').classList.add('hidden');$('formMessage').textContent=''}
+function editProduct(id){const p=products.find(x=>x.id===id);if(!p)return;$('productId').value=p.id;$('editorTitle').textContent='Edit product';$('pName').value=p.name||'';$('pSlug').value=p.slug||'';$('pDescription').value=p.description||'';$('pPrice').value=p.price??0;$('pCompare').value=p.compare_at_price??'';$('pSku').value=p.sku||'';$('pStock').value=p.stock??0;$('pStatus').value=p.status||'active';$('pBadge').value=p.badge||'';$('pColor').value=p.color||'';$('pTags').value=(p.tags||[]).join(', ');$('pImages').value=(p.image_urls||[]).join('\n');$('pFeatured').checked=!!p.featured;$('pBestseller').checked=!!p.bestseller;$('pSeoTitle').value=p.seo_title||'';$('pSeoDescription').value=p.seo_description||'';$('deleteBtn').classList.remove('hidden');$('formMessage').textContent=''}
+$('pName').addEventListener('input',()=>{if(!$('productId').value)$('pSlug').value=slugify($('pName').value)});
+$('productForm').onsubmit=async e=>{e.preventDefault();$('formMessage').textContent='Saving...';const id=$('productId').value;const payload={name:$('pName').value.trim(),slug:$('pSlug').value.trim()||slugify($('pName').value),description:$('pDescription').value.trim(),price:Number($('pPrice').value||0),compare_at_price:$('pCompare').value===''?null:Number($('pCompare').value),sku:$('pSku').value.trim()||null,stock:Number($('pStock').value||0),status:$('pStatus').value,featured:$('pFeatured').checked,bestseller:$('pBestseller').checked,badge:$('pBadge').value.trim()||null,color:$('pColor').value.trim()||null,tags:$('pTags').value.split(',').map(x=>x.trim()).filter(Boolean),image_urls:$('pImages').value.split('\n').map(x=>x.trim()).filter(Boolean),seo_title:$('pSeoTitle').value.trim()||null,seo_description:$('pSeoDescription').value.trim()||null};const r=id?await db.from('products').update(payload).eq('id',id):await db.from('products').insert(payload);if(r.error){$('formMessage').className='error';$('formMessage').textContent=r.error.message;return}$('formMessage').className='success';$('formMessage').textContent='Saved ✓';await loadAll();if(!id)newProduct()}
+async function deleteProduct(){const id=$('productId').value;if(!id)return;if(!confirm('Delete this product?'))return;const r=await db.from('products').delete().eq('id',id);if(r.error){$('formMessage').className='error';$('formMessage').textContent=r.error.message;return}newProduct();await loadAll()}
+async function loadCollections(){const r=await db.from('collections').select('*').order('sort_order',{ascending:true});if(r.error){alert(r.error.message);return}collections=r.data||[];renderCollections()}
+function renderCollections(){$('collectionRows').innerHTML=collections.length?collections.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.slug)}</td><td><span class="badge">${esc(c.status)}</span></td><td>${c.sort_order}</td><td><button onclick="editCollection('${c.id}')">Edit</button></td></tr>`).join(''):`<tr><td colspan="5" class="empty">No collections yet.</td></tr>`}
+function newCollection(){$('collectionId').value='';$('collectionTitle').textContent='Add collection';$('collectionForm').reset();$('cSort').value=0;$('deleteCollectionBtn').classList.add('hidden');$('collectionMessage').textContent=''}
+function editCollection(id){const c=collections.find(x=>x.id===id);if(!c)return;$('collectionId').value=c.id;$('collectionTitle').textContent='Edit collection';$('cName').value=c.name||'';$('cSlug').value=c.slug||'';$('cDescription').value=c.description||'';$('cImage').value=c.image_url||'';$('cStatus').value=c.status||'active';$('cSort').value=c.sort_order??0;$('cSeoTitle').value=c.seo_title||'';$('cSeoDescription').value=c.seo_description||'';$('deleteCollectionBtn').classList.remove('hidden');$('collectionMessage').textContent=''}
+$('cName').addEventListener('input',()=>{if(!$('collectionId').value)$('cSlug').value=slugify($('cName').value)});
+$('collectionForm').onsubmit=async e=>{e.preventDefault();$('collectionMessage').textContent='Saving...';const id=$('collectionId').value;const payload={name:$('cName').value.trim(),slug:$('cSlug').value.trim()||slugify($('cName').value),description:$('cDescription').value.trim()||null,image_url:$('cImage').value.trim()||null,status:$('cStatus').value,sort_order:Number($('cSort').value||0),seo_title:$('cSeoTitle').value.trim()||null,seo_description:$('cSeoDescription').value.trim()||null};const r=id?await db.from('collections').update(payload).eq('id',id):await db.from('collections').insert(payload);if(r.error){$('collectionMessage').className='error';$('collectionMessage').textContent=r.error.message;return}$('collectionMessage').className='success';$('collectionMessage').textContent='Saved ✓';await loadAll();if(!id)newCollection()}
+async function deleteCollection(){const id=$('collectionId').value;if(!id)return;if(!confirm('Delete this collection?'))return;const r=await db.from('collections').delete().eq('id',id);if(r.error){$('collectionMessage').className='error';$('collectionMessage').textContent=r.error.message;return}newCollection();await loadAll()}
+function showTab(id,btn){document.querySelectorAll('[id$="Tab"]').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
+function num(v){return Number(v||0).toLocaleString('en-US',{maximumFractionDigits:2})}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+async function logout(){await db.auth.signOut();location.reload()}
+start();
+</script>
+</body>
+</html>
