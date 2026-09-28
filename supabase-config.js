@@ -1,0 +1,1 @@
+window.TATTOOUI_SUPABASE={url:"https://ahvmgdzjfyuhgtgpuavo.supabase.co",publishableKey:"sb_publishable_a0EPICREKG8vXzzComKONQ_SWFuOZAi"};
