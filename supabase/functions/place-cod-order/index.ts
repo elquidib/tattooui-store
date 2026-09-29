@@ -107,7 +107,8 @@ Deno.serve(async (req) => {
   const metaPixelId = Deno.env.get("META_PIXEL_ID") || "2334047827334740";
   const purchaseEventId = String(body.purchase_event_id || "").trim();
 
-  if (metaToken && metaPixelId && purchaseEventId && result?.total != null) {
+  async function sendMetaPurchase() {
+    if (metaToken && metaPixelId && purchaseEventId && result?.total != null) {
     try {
       const sha256 = async (value: string) => {
         const bytes = new TextEncoder().encode(value);
@@ -179,6 +180,13 @@ Deno.serve(async (req) => {
     }
   } else {
     console.warn("Meta CAPI Purchase skipped: missing configuration or purchase_event_id.");
+  }
+
+
+  if (typeof EdgeRuntime !== "undefined" && typeof EdgeRuntime.waitUntil === "function") {
+    EdgeRuntime.waitUntil(sendMetaPurchase());
+  } else {
+    await sendMetaPurchase();
   }
 
   return json({ data: result, purchase_event_id: purchaseEventId });
