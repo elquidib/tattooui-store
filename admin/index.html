@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TATTOOUI Admin</title>
+<title>TATTO ✦ OUI — Admin</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="../favicon.svg">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../supabase-config.js"></script>
@@ -13,7 +13,7 @@
 button,input,textarea,select{font:inherit}button{border:0;border-radius:10px;padding:10px 15px;background:#111;color:#fff;font-weight:700;cursor:pointer}button.secondary{background:#eeeae3;color:#111}button.danger{background:#b42318}button:disabled{opacity:.5;cursor:not-allowed}
 .wrap{max-width:1250px;margin:auto;padding:24px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 2px 12px #00000006}.editor-card{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto}
 .login{max-width:460px;margin:10vh auto}.muted{color:var(--muted)}.error{color:#b42318}.success{color:#18794e}
-.top{display:flex;justify-content:space-between;align-items:center;gap:16px}.top h1{margin:0}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px}.top h1{margin:0}.admin-wordmark{font-family:"Playfair Display",Georgia,serif;letter-spacing:.12em}.admin-wordmark span{display:inline-block;font:16px/1 Arial,sans-serif;letter-spacing:0;margin:0 2px;transform:translateY(-6px)}.actions{display:flex;gap:8px;flex-wrap:wrap}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{padding:18px;border:1px solid var(--line);border-radius:12px;background:#fff}.stat b{display:block;font-size:25px;margin-top:7px}
 .layout{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(420px,.92fr);gap:16px;align-items:start}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar input{max-width:330px}
 label{display:block;font-weight:700;margin-top:10px}input,textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:#111}textarea{min-height:90px;resize:vertical}
@@ -33,7 +33,7 @@ label{display:block;font-weight:700;margin-top:10px}input,textarea,select{width:
 </div></div>
 
 <div id="app" class="wrap hidden">
-<div class="card top"><div><h1>TATTOOUI Admin</h1><p id="adminEmail" class="muted"></p></div><div class="actions"><button class="secondary" onclick="loadAll()">Refresh</button><button onclick="logout()">Log out</button></div></div>
+<div class="card top"><div><h1><span class="admin-wordmark">TATTO<span aria-hidden="true">✦</span>OUI</span> Admin</h1><p id="adminEmail" class="muted"></p></div><div class="actions"><button class="secondary" onclick="loadAll()">Refresh</button><button onclick="logout()">Log out</button></div></div>
 <div class="stats">
 <div class="stat">Products<b id="statProducts">0</b></div><div class="stat">Orders<b id="statOrders">0</b></div><div class="stat">Reviews<b id="statReviews">0</b></div>
 </div>
