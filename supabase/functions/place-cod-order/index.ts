@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
   } else {
     console.warn("Meta CAPI Purchase skipped: missing configuration or purchase_event_id.");
   }
-
+  }
 
   if (typeof EdgeRuntime !== "undefined" && typeof EdgeRuntime.waitUntil === "function") {
     EdgeRuntime.waitUntil(sendMetaPurchase());
