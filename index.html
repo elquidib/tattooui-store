@@ -163,8 +163,8 @@ return `<article class="card" onclick="openProduct(${p.id})"><div class="card-me
 }
 function homeView(){
 const heroStyle=siteSettings.hero_desktop_url?"--hero-desktop:url('"+String(siteSettings.hero_desktop_url).replace(/'/g,"%27")+"');--hero-mobile:url('"+String(siteSettings.hero_mobile_url||siteSettings.hero_desktop_url).replace(/'/g,"%27")+"');":"";
-let cats=["All","Symbol","Dragon","Wings","Numbers","Script"];
-let list=products.filter(p=>(filter==="All"||p.cat===filter||p.badge===filter)&&(!searchTerm||[p.name,p.cat,...p.tags].join(" ").toLowerCase().includes(searchTerm.toLowerCase())));
+let cats=["All","Featured","Bestseller",...Array.from(new Set(products.map(p=>p.cat).filter(Boolean)))];
+let list=products.filter(p=>(filter==="All"||(filter==="Featured"&&p.featured)||(filter==="Bestseller"&&p.bestseller)||p.cat===filter||p.badge===filter)&&(!searchTerm||[p.name,p.cat,...p.tags].join(" ").toLowerCase().includes(searchTerm.toLowerCase())));
 return `<div id="homeView" class="view active">${header()}
 <section class="hero ${heroStyle?"has-image":""}" style="${heroStyle}"><div class="hero-inner"><div class="eyebrow">${esc(siteSettings.announcement_text||"Temporary tattoos • made for your mood • Morocco")}</div><h1>${esc(siteSettings.hero_title||"Wear it.")}${siteSettings.hero_title?"":"<br>Change it."}</h1><p>${esc(siteSettings.hero_subtitle||"Express yourself without the commitment. Discover temporary tattoos designed to make every look feel a little more yours.")}</p><a class="btn light" href="${esc(siteSettings.hero_button_url||"#shop")}">${esc(siteSettings.hero_button_text||"Shop the collection")}</a></div></section>
 <div class="trust"><div>Easy to apply<span>Simple, no appointment</span></div><div>Easy to change<span>New style when you want</span></div><div>Cash on delivery<span>Order across Morocco</span></div><div>Made for Morocco<span>Delivery nationwide</span></div></div>
