@@ -21,7 +21,7 @@ jobs:
           import re
           from pathlib import Path
           html=Path("index.html").read_text()
-          scripts=re.findall(r"<script(?:\\s[^>]*)?>([\\s\\S]*?)</script>",html,re.I)
+          scripts=re.findall(r"<script(?:\s[^>]*)?>([\s\S]*?)</script>",html,re.I)
           inline=[s for s in scripts if "function render()" in s]
           assert inline, "Storefront inline script not found"
           Path("/tmp/storefront.js").write_text(inline[-1])
@@ -34,7 +34,7 @@ jobs:
           import re
           from pathlib import Path
           html=Path("admin/index.html").read_text()
-          scripts=re.findall(r"<script(?:\\s[^>]*)?>([\\s\\S]*?)</script>",html,re.I)
+          scripts=re.findall(r"<script(?:\s[^>]*)?>([\s\S]*?)</script>",html,re.I)
           inline=[s for s in scripts if "function start()" in s]
           assert inline, "Admin inline script not found"
           Path("/tmp/admin.js").write_text(inline[-1])
