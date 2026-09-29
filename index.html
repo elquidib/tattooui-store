@@ -147,9 +147,9 @@ const money=n=>`${n.toLocaleString("fr-MA")} DH`;
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 function header(){
 return `<div class="topbar">${esc(siteSettings.announcement_text||"Cash on delivery in Morocco")}</div><header class="header"><nav class="nav">
-<div class="navlinks"><button onclick="home()">Shop</button><button onclick="document.getElementById('story').scrollIntoView()">Our story</button></div>
+<div class="navlinks"><button onclick="home()">Shop</button><button onclick="home();setTimeout(()=>document.getElementById('story')?.scrollIntoView({behavior:'smooth'}),50)">Our story</button></div>
 <button class="iconbtn mobile-menu" onclick="home()" aria-label="Shop">☰</button>
-<a class="logo" href="#/" onclick="home();return false">TATTOOUI</a>
+<a class="logo" href="#/" onclick="home();return false">${siteSettings.logo_url?`<img src="${esc(siteSettings.logo_url)}" alt="${esc(siteSettings.store_name||"TATTOOUI")}" style="height:38px;max-width:170px;object-fit:contain">`:esc(siteSettings.store_name||"TATTOOUI")}</a>
 <div class="actions"><button class="iconbtn" onclick="focusSearch()" aria-label="Search">⌕</button><button class="iconbtn" onclick="openCart()" aria-label="Cart">🛒<span class="badge" id="cartBadge">${cartCount()}</span></button></div>
 </nav></header>`;
 }
