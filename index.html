@@ -31,6 +31,12 @@
   fbq("init", window.TATTOOUI_META_PIXEL_ID);
   fbq("track","PageView");
 </script>
+<script>
+  // Define the Turnstile onload callback before Cloudflare's async script can execute.
+  window.tattoouiTurnstileLoaded = () => setTimeout(() => {
+    if (typeof window.renderTurnstile === "function") window.renderTurnstile();
+  }, 50);
+</script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=tattoouiTurnstileLoaded" async defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,7 +104,7 @@ function metaTrack(eventName, params = {}) {
 let turnstileWidgetId = null;
 let turnstileToken = "";
 function resetTurnstile(){turnstileToken="";try{if(turnstileWidgetId!==null&&window.turnstile)window.turnstile.reset(turnstileWidgetId)}catch(e){console.warn("Turnstile reset failed",e)}}
-window.tattoouiTurnstileLoaded=()=>setTimeout(renderTurnstile,50);function renderTurnstile(){const el=document.getElementById("turnstileWidget");if(!el||!TURNSTILE_SITE_KEY||!window.turnstile)return;if(turnstileWidgetId!==null)return;try{turnstileWidgetId=window.turnstile.render(el,{sitekey:TURNSTILE_SITE_KEY,theme:"light",callback:t=>{turnstileToken=t},"expired-callback":()=>{turnstileToken=""},"error-callback":()=>{turnstileToken=""}})}catch(e){console.warn("Turnstile render failed",e)}}
+function renderTurnstile(){const el=document.getElementById("turnstileWidget");if(!el||!TURNSTILE_SITE_KEY||!window.turnstile)return;if(turnstileWidgetId!==null)return;try{turnstileWidgetId=window.turnstile.render(el,{sitekey:TURNSTILE_SITE_KEY,theme:"light",callback:t=>{turnstileToken=t},"expired-callback":()=>{turnstileToken=""},"error-callback":()=>{turnstileToken=""}})}catch(e){console.warn("Turnstile render failed",e)}}
 const db=supabase.createClient(TATTOOUI_SUPABASE.url,TATTOOUI_SUPABASE.publishableKey);
 const NO_IMAGE="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800'><rect width='100%' height='100%' fill='#e7e4dd'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#777' font-family='Arial' font-size='28'>TATTOOUI</text></svg>");
 let siteSettings={store_name:"TATTOOUI",shipping_fee:20,announcement_text:"Cash on delivery in Morocco",instagram_url:"https://www.instagram.com/tattooui_/"};
