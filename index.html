@@ -157,7 +157,8 @@ function cacheStorefrontData(){
   try{localStorage.setItem(STOREFRONT_CACHE_KEY,JSON.stringify({savedAt:Date.now(),products,reviews,storeCollections}))}catch(e){}
 }
 const NO_IMAGE="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800'><rect width='100%' height='100%' fill='#e7e4dd'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#777' font-family='Arial' font-size='28'>TATTO✦OUI</text></svg>");
-let siteSettings={store_name:"TATTO✦OUI",shipping_fee:20,announcement_text:"Cash on delivery in Morocco",instagram_url:"https://www.instagram.com/tattooui_/",story_image_url:null,story_desktop_url:null,story_mobile_url:null};
+const TATTOOUI_BRAND_NAME="TATTO✦OUI";
+let siteSettings={store_name:TATTOOUI_BRAND_NAME,shipping_fee:20,announcement_text:"Cash on delivery in Morocco",instagram_url:"https://www.instagram.com/tattooui_/",story_image_url:null,story_desktop_url:null,story_mobile_url:null};
 let shippingFee=20;
 let reviews=[];
 let storeCollections=[];
@@ -306,7 +307,7 @@ function applyLanguage(){
   const nodes=[];
   while(walker.nextNode())nodes.push(walker.currentNode);
   nodes.forEach(node=>{
-    if(node.parentElement?.closest("script,style,.language-switcher"))return;
+    if(node.parentElement?.closest("script,style,.language-switcher,[data-brand-name]"))return;
     const raw=node.nodeValue||"",trim=raw.trim();
     if(!trim)return;
     const translated=translateString(trim);
@@ -350,11 +351,11 @@ return `<div class="topbar">${esc(siteSettings.announcement_text||"Cash on deliv
   <div class="menu-divider"></div>
   <button type="button" onclick="closeMobileMenu();setTimeout(()=>document.getElementById('contact')?.scrollIntoView({behavior:'smooth',block:'start'}),80)">Contact</button>
 </div>
-<a class="logo" href="#/" onclick="home();return false">${siteSettings.logo_url?`<img src="${esc(siteSettings.logo_url)}" alt="${esc(siteSettings.store_name||"TATTO✦OUI")}" style="height:38px;max-width:170px;object-fit:contain">`:`<span class="logo-wordmark"><span>TATTO</span><span class="logo-star" aria-hidden="true">✦</span><span>OUI</span></span>`}</a>
+<a class="logo" href="#/" onclick="home();return false" data-brand-name="true">${siteSettings.logo_url?`<img src="${esc(siteSettings.logo_url)}" alt="${esc(TATTOOUI_BRAND_NAME)}" style="height:38px;max-width:170px;object-fit:contain">`:`<span class="logo-wordmark"><span>TATTO</span><span class="logo-star" aria-hidden="true">✦</span><span>OUI</span></span>`}</a>
 <div class="actions"><button class="iconbtn" onclick="openCart()" aria-label="Cart">🛒<span class="badge" id="cartBadge">${cartCount()}</span></button></div>
 </nav></header>${languageSwitcher()}`;
 }
-function footer(){const ig=siteSettings.instagram_url||'https://www.instagram.com/tattooui_/';const fb=siteSettings.facebook_url;const tt=siteSettings.tiktok_url;return `<footer class="footer"><div class="footer-inner"><div class="footer-grid"><div class="footer-brand"><h3>${esc(siteSettings.store_name||'TATTO✦OUI')}</h3><p>Temporary tattoos made for your mood. Express yourself, change it whenever you want.</p><div class="footer-social"><a href="${esc(ig)}" target="_blank" rel="noopener" aria-label="Instagram">IG</a>${fb?`<a href="${esc(fb)}" target="_blank" rel="noopener" aria-label="Facebook">F</a>`:''}${tt?`<a href="${esc(tt)}" target="_blank" rel="noopener" aria-label="TikTok">TT</a>`:''}</div></div><div><h4>Shop</h4><a href="#/" onclick="goToShop();return false">All tattoos</a><a href="#/" onclick="setFilter('New');return false">New</a><a href="#/" onclick="setFilter('Best Seller');return false">Bestsellers</a></div><div><h4>Help</h4><a href="#/" onclick="goToSection('faq');return false">FAQ</a><a href="#/" onclick="goToSection('trust');return false">Delivery & COD</a><a href="#/" onclick="goToSection('care');return false">How to apply</a></div><div><h4>Follow</h4><a href="${esc(ig)}" target="_blank" rel="noopener">Instagram</a>${fb?`<a href="${esc(fb)}" target="_blank" rel="noopener">Facebook</a>`:''}${tt?`<a href="${esc(tt)}" target="_blank" rel="noopener">TikTok</a>`:''}</div></div><div class="copyright"><span>© ${new Date().getFullYear()} ${esc(siteSettings.store_name||'TATTO✦OUI')}. All rights reserved.</span><span class="copyright-note"><a href="#/privacy">Privacy</a> · <a href="#/terms">Terms</a> · <a href="#/returns">Returns</a> · <a href="#/shipping">Shipping</a> · <a href="#/contact">Contact</a></span></div></div></footer>`}
+function footer(){const ig=siteSettings.instagram_url||'https://www.instagram.com/tattooui_/';const fb=siteSettings.facebook_url;const tt=siteSettings.tiktok_url;return `<footer class="footer"><div class="footer-inner"><div class="footer-grid"><div class="footer-brand"><h3 data-brand-name="true">${esc(TATTOOUI_BRAND_NAME)}</h3><p>Temporary tattoos made for your mood. Express yourself, change it whenever you want.</p><div class="footer-social"><a href="${esc(ig)}" target="_blank" rel="noopener" aria-label="Instagram">IG</a>${fb?`<a href="${esc(fb)}" target="_blank" rel="noopener" aria-label="Facebook">F</a>`:''}${tt?`<a href="${esc(tt)}" target="_blank" rel="noopener" aria-label="TikTok">TT</a>`:''}</div></div><div><h4>Shop</h4><a href="#/" onclick="goToShop();return false">All tattoos</a><a href="#/" onclick="setFilter('New');return false">New</a><a href="#/" onclick="setFilter('Best Seller');return false">Bestsellers</a></div><div><h4>Help</h4><a href="#/" onclick="goToSection('faq');return false">FAQ</a><a href="#/" onclick="goToSection('trust');return false">Delivery & COD</a><a href="#/" onclick="goToSection('care');return false">How to apply</a></div><div><h4>Follow</h4><a href="${esc(ig)}" target="_blank" rel="noopener">Instagram</a>${fb?`<a href="${esc(fb)}" target="_blank" rel="noopener">Facebook</a>`:''}${tt?`<a href="${esc(tt)}" target="_blank" rel="noopener">TikTok</a>`:''}</div></div><div class="copyright"><span>© ${new Date().getFullYear()} <span data-brand-name="true">${esc(TATTOOUI_BRAND_NAME)}</span>. All rights reserved.</span><span class="copyright-note"><a href="#/privacy">Privacy</a> · <a href="#/terms">Terms</a> · <a href="#/returns">Returns</a> · <a href="#/shipping">Shipping</a> · <a href="#/contact">Contact</a></span></div></div></footer>`}
 function home(){
 closeMobileMenu();
 location.hash="/"; render();
