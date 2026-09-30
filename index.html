@@ -14,7 +14,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="TATTO✦OUI — Temporary Tattoos">
 <meta name="twitter:description" content="Temporary tattoos made for your mood. Cash on delivery across Morocco.">
-<link rel="canonical" href="https://tattooui-store.pages.dev/">
+<link rel="canonical" href="https://tattooui.com/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/favicon.svg">
 <script type="application/ld+json" id="storeStructuredData"></script>
 <title>TATTO✦OUI — Temporary Tattoos</title>
@@ -573,7 +573,7 @@ function hydrateDeferredStory(){
 function render(){const path=location.hash.replace(/^#/,"")||"/";let app=document.getElementById("app");if(path.startsWith("/product/")){const p=products.find(x=>x.id===Number(path.split("/")[2]));app.innerHTML=p?productView(p):homeView();if(p&&p.dbId)metaTrack("ViewContent",{content_ids:[String(p.dbId)],content_type:"product",content_name:p.name,value:Number(p.price),currency:"MAD"})}else if(path==="/checkout"){app.innerHTML=checkoutView()}else if(path.startsWith("/order-confirmed/")){app.innerHTML=confirmationView(path.split("/")[2]||"")}else if(["/privacy","/terms","/returns","/shipping","/contact"].includes(path)){app.innerHTML=legalView(path.slice(1))}else app.innerHTML=homeView();applyLanguage();updateBadge();renderCart();hydrateDeferredStory()}
 function updateSEO(){
   const path=location.hash.replace(/^#/,"")||"/";
-  const base="https://tattooui-store.pages.dev";
+  const base="https://tattooui.com";
   const p=path.startsWith("/product/")?products.find(x=>x.id===Number(path.split("/")[2])):null;
   const title=p?(String(p.name)+" — TATTO✦OUI"):"TATTO✦OUI — Temporary Tattoos";
   const desc=p?String(p.desc||"Temporary tattoo design.").slice(0,155):"Premium temporary tattoos in Morocco. Express your style. Cash on delivery across Morocco.";
