@@ -340,8 +340,18 @@ function fastSupabaseImage(src,quality=75){
 }
 function fastProductImage(src){return fastSupabaseImage(src,75)}
 function fastSiteImage(src){return fastSupabaseImage(src,72)}
+function localizedAnnouncement(){
+  const value=String(siteSettings.announcement_text||"").trim();
+  const normalized=value.toLowerCase().replace(/\\s+/g," ");
+  if(normalized.includes("free delivery")&&normalized.includes("160")){
+    if(currentLanguage==="fr")return "Livraison gratuite pour toute commande de plus de 160 DH";
+    if(currentLanguage==="ar")return "التوصيل مجاني لطلبات أكثر من 160 درهم";
+    return "Free delivery on orders over 160 DH";
+  }
+  return translateString(value||"Cash on delivery in Morocco");
+}
 function header(){
-return `<div class="topbar"><span class="topbar-message">${esc(siteSettings.announcement_text||"Cash on delivery in Morocco")}</span></div><header class="header"><nav class="nav">
+return `<div class="topbar"><span class="topbar-message">${esc(localizedAnnouncement())}</span></div><header class="header"><nav class="nav">
 <div class="navlinks"><button onclick="home()">Shop</button><button onclick="home();setTimeout(()=>document.getElementById('story')?.scrollIntoView({behavior:'smooth'}),50)">Our story</button></div>
 <button class="iconbtn mobile-menu" onclick="toggleMobileMenu(event)" aria-label="Open menu" aria-expanded="false">☰</button>
 <div class="mobile-menu-panel" id="mobileMenuPanel" aria-hidden="true">
