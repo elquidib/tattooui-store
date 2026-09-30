@@ -117,7 +117,6 @@
 <div class="toast" id="toast"></div>
 <button class="backtop" id="backtop" onclick="goToShop()" aria-label="Back to products">↑</button>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./supabase-config.js"></script>
 <script>
 const TURNSTILE_SITE_KEY = window.TURNSTILE_SITE_KEY || "";
@@ -134,41 +133,42 @@ let turnstileWidgetId = null;
 let turnstileToken = "";
 function resetTurnstile(){turnstileToken="";try{if(turnstileWidgetId!==null&&window.turnstile){if(typeof window.turnstile.remove==="function")window.turnstile.remove(turnstileWidgetId);else window.turnstile.reset(turnstileWidgetId)}}catch(e){console.warn("Turnstile reset failed",e)}finally{turnstileWidgetId=null}}
 function renderTurnstile(){const el=document.getElementById("turnstileWidget");if(!el||!TURNSTILE_SITE_KEY||!window.turnstile)return;if(turnstileWidgetId!==null)return;try{turnstileWidgetId=window.turnstile.render(el,{sitekey:TURNSTILE_SITE_KEY,theme:"light",callback:t=>{turnstileToken=t},"expired-callback":()=>{turnstileToken=""},"error-callback":()=>{turnstileToken=""}})}catch(e){console.warn("Turnstile render failed",e)}}
-const db=supabase.createClient(TATTOOUI_SUPABASE.url,TATTOOUI_SUPABASE.publishableKey);
+const SUPABASE_URL=TATTOOUI_SUPABASE.url;
+const SUPABASE_KEY=TATTOOUI_SUPABASE.publishableKey;
+const STOREFRONT_CACHE_KEY="tattooui-storefront-cache-v2";
+async function supabaseRest(path){
+  const response=await fetch(SUPABASE_URL+"/rest/v1/"+path,{headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY}});
+  if(!response.ok)throw new Error("Storefront data request failed ("+response.status+")");
+  return response.json();
+}
+function restoreStorefrontCache(){
+  try{
+    const cached=JSON.parse(localStorage.getItem(STOREFRONT_CACHE_KEY)||"null");
+    if(!cached)return false;
+    if(Array.isArray(cached.products)&&cached.products.length)products=cached.products.map(normalizeProductImages);
+    if(cached.siteSettings&&typeof cached.siteSettings==="object"){
+      siteSettings={...siteSettings,...cached.siteSettings};
+      shippingFee=Math.max(0,Number(siteSettings.shipping_fee??20));
+    }
+    if(Array.isArray(cached.reviews))reviews=cached.reviews;
+    if(Array.isArray(cached.storeCollections))storeCollections=cached.storeCollections;
+    return true;
+  }catch(e){return false}
+}
+function cacheStorefrontData(){
+  try{localStorage.setItem(STOREFRONT_CACHE_KEY,JSON.stringify({savedAt:Date.now(),products,siteSettings,reviews,storeCollections}))}catch(e){}
+}
 const NO_IMAGE="data:image/svg+xml;charset=UTF-8,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800'><rect width='100%' height='100%' fill='#e7e4dd'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#777' font-family='Arial' font-size='28'>TATTO✦OUI</text></svg>");
 let siteSettings={store_name:"TATTO✦OUI",shipping_fee:20,announcement_text:"Cash on delivery in Morocco",instagram_url:"https://www.instagram.com/tattooui_/",story_image_url:null,story_desktop_url:null,story_mobile_url:null};
 let shippingFee=20;
 let reviews=[];
 let storeCollections=[];
 let products = [
- {id:1,name:"Tribal Symbols",price:99,cat:"Symbol",color:"Black",badge:"",is_new:true,is_promo:false,desc:"Bold tribal-inspired temporary tattoo designs made for a strong, graphic look. Easy to wear, easy to change.",images:[
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-1.jpeg",pos:"center"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-1.jpeg",pos:"p1"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-1.jpeg",pos:"p2"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-1.jpeg",pos:"p3"}
-],tags:["tribal","symbol","black"]},
- {id:2,name:"Dragon Script",price:99,cat:"Dragon",color:"Black",badge:"New",is_new:true,is_promo:false,desc:"A sharp dragon-inspired temporary tattoo with a strong street and gothic character.",images:[
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-2.jpeg",pos:"center"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-2.jpeg",pos:"left"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-2.jpeg",pos:"right"}
-],tags:["dragon","script","black"]},
- {id:3,name:"Blessed Wings",price:119,cat:"Wings",color:"Black",badge:"Bestseller",is_new:true,is_promo:false,desc:"Wing and lettering designs with a bold black-ink look for a statement style.",images:[
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-3.jpeg",pos:"center"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-3.jpeg",pos:"left"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-3.jpeg",pos:"right"}
-],tags:["wings","lettering","black"]},
- {id:4,name:"Gothic Numbers",price:99,cat:"Numbers",color:"Black",badge:"",is_new:true,is_promo:false,desc:"Gothic number designs made for dates, years and personal details.",images:[
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-4.jpeg",pos:"center"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-4.jpeg",pos:"p1"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-4.jpeg",pos:"p2"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-4.jpeg",pos:"p3"}
-],tags:["numbers","gothic","black"]},
- {id:5,name:"Gothic Script",price:169,cat:"Script",color:"Black",badge:"Statement",is_new:true,is_promo:false,desc:"A collection of dramatic gothic script designs for a bold temporary tattoo look.",images:[
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-5.jpeg",pos:"center"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-5.jpeg",pos:"top"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-5.jpeg",pos:"mid"},
-  {src:"https://raw.githubusercontent.com/elquidib/tattooui-store/main/product-5.jpeg",pos:"bottom"}
-],tags:["script","gothic","black"]}
+ {id:1,name:"Tribal Symbols",price:99,cat:"Symbol",color:"Black",badge:"",is_new:true,is_promo:false,desc:"Bold tribal-inspired temporary tattoo designs made for a strong, graphic look. Easy to wear, easy to change.",images:[],tags:["tribal","symbol","black"]},
+ {id:2,name:"Dragon Script",price:99,cat:"Dragon",color:"Black",badge:"New",is_new:true,is_promo:false,desc:"A sharp dragon-inspired temporary tattoo with a strong street and gothic character.",images:[],tags:["dragon","script","black"]},
+ {id:3,name:"Blessed Wings",price:119,cat:"Wings",color:"Black",badge:"Bestseller",is_new:true,is_promo:false,desc:"Wing and lettering designs with a bold black-ink look for a statement style.",images:[],tags:["wings","lettering","black"]},
+ {id:4,name:"Gothic Numbers",price:99,cat:"Numbers",color:"Black",badge:"",is_new:true,is_promo:false,desc:"Gothic number designs made for dates, years and personal details.",images:[],tags:["numbers","gothic","black"]},
+ {id:5,name:"Gothic Script",price:169,cat:"Script",color:"Black",badge:"Statement",is_new:true,is_promo:false,desc:"A collection of dramatic gothic script designs for a bold temporary tattoo look.",images:[],tags:["script","gothic","black"]}
 ];
 let cart = JSON.parse(localStorage.getItem("tattooui-cart")||"[]");
 
@@ -326,19 +326,21 @@ let currentProduct = null, currentImg = 0, filter="All", searchTerm="";
 const money=n=>`${n.toLocaleString("fr-MA")} DH`;
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 
-function fastProductImage(src){
+function fastSupabaseImage(src,quality=75){
   const value=String(src||"").trim();
   if(!value)return NO_IMAGE;
   try{
     const u=new URL(value);
     if(u.hostname.endsWith("supabase.co")&&u.pathname.includes("/storage/v1/object/public/")){
       u.pathname=u.pathname.replace("/storage/v1/object/public/","/storage/v1/render/image/public/");
-      u.search="?quality=75";
+      u.search="?quality="+quality;
       return u.toString();
     }
   }catch(e){}
   return value;
 }
+function fastProductImage(src){return fastSupabaseImage(src,75)}
+function fastSiteImage(src){return fastSupabaseImage(src,72)}
 function header(){
 return `<div class="topbar">${esc(siteSettings.announcement_text||"Cash on delivery in Morocco")}</div><header class="header"><nav class="nav">
 <div class="navlinks"><button onclick="home()">Shop</button><button onclick="home();setTimeout(()=>document.getElementById('story')?.scrollIntoView({behavior:'smooth'}),50)">Our story</button></div>
@@ -396,12 +398,12 @@ const heroStyle=siteSettings.hero_desktop_url?"--hero-desktop:url('"+String(site
 let cats=["All","Best Seller","New","Promo"];
 let list=products.filter(p=>(filter==="All"||(filter==="Best Seller"&&p.bestseller)||(filter==="New"&&p.is_new)||(filter==="Promo"&&p.is_promo) )&&(!searchTerm||[p.name,p.cat,...p.tags,...(p.collections||[])].join(" ").toLowerCase().includes(searchTerm.toLowerCase())));
 return `<div id="homeView" class="view active">${header()}
-<section class="hero has-image"><div class="hero-media"><picture><source media="(max-width: 800px)" srcset="${esc(siteSettings.hero_mobile_url||siteSettings.hero_desktop_url||"https://images.pexels.com/photos/12765131/pexels-photo-12765131.jpeg?cs=srgb&dl=pexels-estoymhrb-12765131.jpg&fm=jpg")}"><img src="${esc(siteSettings.hero_desktop_url||"https://images.pexels.com/photos/12765131/pexels-photo-12765131.jpeg?cs=srgb&dl=pexels-estoymhrb-12765131.jpg&fm=jpg")}" alt="Fashion portrait showcasing a temporary tattoo style" fetchpriority="high"></picture></div><div class="hero-inner"><div class="eyebrow">Temporary tattoos · made for your mood</div><h1>${esc(siteSettings.hero_title||"Make your mark.")}</h1><p>${esc(siteSettings.hero_subtitle||"Express yourself without the commitment. Discover temporary tattoos designed to make every look feel a little more yours.")}</p><a class="btn light" href="#/" onclick="goToShop();return false">${esc(siteSettings.hero_button_text||"Shop the collection")}</a></div></section>
+<section class="hero has-image"><div class="hero-media"><picture><source media="(max-width: 800px)" srcset="${esc(fastSiteImage(siteSettings.hero_mobile_url||siteSettings.hero_desktop_url||"https://images.pexels.com/photos/12765131/pexels-photo-12765131.jpeg?cs=srgb&dl=pexels-estoymhrb-12765131.jpg&fm=jpg"))}"><img src="${esc(fastSiteImage(siteSettings.hero_desktop_url||"https://images.pexels.com/photos/12765131/pexels-photo-12765131.jpeg?cs=srgb&dl=pexels-estoymhrb-12765131.jpg&fm=jpg"))}" alt="Fashion portrait showcasing a temporary tattoo style" fetchpriority="high" loading="eager" decoding="async"></picture></div><div class="hero-inner"><div class="eyebrow">Temporary tattoos · made for your mood</div><h1>${esc(siteSettings.hero_title||"Make your mark.")}</h1><p>${esc(siteSettings.hero_subtitle||"Express yourself without the commitment. Discover temporary tattoos designed to make every look feel a little more yours.")}</p><a class="btn light" href="#/" onclick="goToShop();return false">${esc(siteSettings.hero_button_text||"Shop the collection")}</a></div></section>
 <div class="trust" id="trust"><div>Easy to apply<span>Simple, no appointment</span></div><div>Easy to change<span>New style when you want</span></div><div>Cash on delivery<span>Order across Morocco</span></div><div>Made for Morocco<span>Delivery nationwide</span></div></div>
 <section class="section" id="shop"><div class="section-head"><div><div class="kicker">The collection</div><h2>Find your ink.</h2></div><p>Five signature designs to start. More drops coming soon.</p></div>
 <div class="filters">${cats.map(c=>`<button class="chip ${filter===c?"active":""}" onclick="setFilter('${c}')">${c}</button>`).join("")}</div>
 <div class="grid" id="productGrid">${list.length?list.map(productCard).join(""):`<div style="grid-column:1/-1;padding:60px;text-align:center;color:#777">No tattoos found.</div>`}</div></section>
-<section class="story" id="story" style="--story-desktop:url('${esc(siteSettings.story_desktop_url||siteSettings.story_image_url||"https://images.pexels.com/photos/9009781/pexels-photo-9009781.jpeg?auto=compress&cs=tinysrgb&w=2400").replace(/'/g,"%27")}');--story-mobile:url('${esc(siteSettings.story_mobile_url||siteSettings.story_desktop_url||siteSettings.story_image_url||"https://images.pexels.com/photos/9009781/pexels-photo-9009781.jpeg?auto=compress&cs=tinysrgb&w=2400").replace(/'/g,"%27")}')"><div class="story-inner"><div class="story-copy"><div class="eyebrow">The TATTO✦OUI idea</div><h2>Your style isn't permanent.</h2><p>Some days you want minimal. Some days you want bold. TATTO✦OUI lets you change the mood without making a lifetime decision.</p><div class="story-list"><div class="story-item"><b class="story-num">01</b><span>Choose the design that fits your mood.</span></div><div class="story-item"><b class="story-num">02</b><span>Apply it in minutes.</span></div><div class="story-item"><b class="story-num">03</b><span>Change your look whenever you want.</span></div></div></div><div class="story-visual" aria-hidden="true"></div></div></section>
+<section class="story" id="story" data-story-desktop="${esc(fastSiteImage(siteSettings.story_desktop_url||siteSettings.story_image_url||"https://images.pexels.com/photos/9009781/pexels-photo-9009781.jpeg?auto=compress&cs=tinysrgb&w=2400"))}" data-story-mobile="${esc(fastSiteImage(siteSettings.story_mobile_url||siteSettings.story_desktop_url||siteSettings.story_image_url||"https://images.pexels.com/photos/9009781/pexels-photo-9009781.jpeg?auto=compress&cs=tinysrgb&w=2400"))}"><div class="story-inner"><div class="story-copy"><div class="eyebrow">The TATTO✦OUI idea</div><h2>Your style isn't permanent.</h2><p>Some days you want minimal. Some days you want bold. TATTO✦OUI lets you change the mood without making a lifetime decision.</p><div class="story-list"><div class="story-item"><b class="story-num">01</b><span>Choose the design that fits your mood.</span></div><div class="story-item"><b class="story-num">02</b><span>Apply it in minutes.</span></div><div class="story-item"><b class="story-num">03</b><span>Change your look whenever you want.</span></div></div></div><div class="story-visual" aria-hidden="true"></div></div></section>
 <section class="section" id="care"><div class="section-head"><div><div class="kicker">Simple by design</div><h2>How it works.</h2></div></div><div class="grid how-grid" style="grid-template-columns:repeat(3,1fr)"><div class="how-step"><div class="kicker">01</div><h3>Clean</h3><p>Clean and dry the skin before application.</p></div><div class="how-step"><div class="kicker">02</div><h3>Apply</h3><p>Place the tattoo face-down and press with water as directed.</p></div><div class="how-step"><div class="kicker">03</div><h3>Wear</h3><p>Let it dry and enjoy your new look.</p></div></div></section>
 <section class="section" id="faq"><div class="faq"><div class="section-head"><div><div class="kicker">Need to know</div><h2>FAQ</h2></div></div><details><summary>How long do temporary tattoos last? <span>⌄</span></summary><p>Wear time depends on placement, skin type, friction and care. Avoid excessive rubbing and oils to help the tattoo last longer.</p></details><details><summary>Do you deliver across Morocco? <span>⌄</span></summary><p>Yes. We offer delivery across Morocco with cash on delivery. Delivery details are confirmed when we process your order.</p></details><details><summary>Can I order more than one design? <span>⌄</span></summary><p>Yes. Add multiple designs to your cart and submit them together at checkout.</p></details></div></section>
 <section class="section newsletter" id="contact"><div class="kicker">Stay in the loop</div><h2>New drops. No spam.</h2><p>Join the TATTO✦OUI list for new designs and special drops.</p><form class="newsletter-form" onsubmit="event.preventDefault();toast('Thanks — you’re on the list.')"><input type="email" required placeholder="Your email"><button class="btn" type="submit">Join</button></form></section>
@@ -418,7 +420,54 @@ setTimeout(()=>{const input=document.getElementById("siteSearch");if(!input)retu
 function openProduct(id){currentProduct=products.find(p=>p.id===id);currentImg=0;location.hash=`/product/${id}`;render();window.scrollTo({top:0,behavior:"instant"})}
 function normalizeProductImages(p){const seen=new Set();p.images=(p.images||[]).filter(x=>x&&x.src&&String(x.src).trim()).filter(x=>{const src=String(x.src).trim();if(seen.has(src))return false;seen.add(src);return true});return p}
 function stableProductId(uuid){let h=0;for(const ch of String(uuid||'')){h=((h<<5)-h)+ch.charCodeAt(0);h|=0}return Math.abs(h)+100}
-async function syncStorefrontProductImages(){try{const [pr,sr,rr,pc,cr]=await Promise.all([db.from('products').select('*').eq('status','active').order('created_at',{ascending:false}),db.from('site_settings').select('*').eq('id',true).maybeSingle(),db.from('reviews').select('*').eq('approved',true).order('created_at',{ascending:false}),db.from('product_collections').select('product_id,collection_id'),db.from('collections').select('id,name,slug').eq('status','active').order('sort_order',{ascending:true})]);if(pr.error)throw pr.error;const oldByName=new Map(products.map(p=>[p.name,p]));siteSettings={...siteSettings,...(sr.data||{})};shippingFee=Math.max(0,Number(siteSettings.shipping_fee??20));reviews=rr.error?[]:(rr.data||[]);storeCollections=cr.error?[]:(cr.data||[]);const collectionNames=new Map(storeCollections.map(x=>[x.id,x.name]));const productCollectionMap=new Map();(pc.error?[]:(pc.data||[])).forEach(x=>{const name=collectionNames.get(x.collection_id);if(name){const arr=productCollectionMap.get(x.product_id)||[];arr.push(name);productCollectionMap.set(x.product_id,arr)}});products=(pr.data||[]).map(row=>{const old=oldByName.get(row.name)||{};return normalizeProductImages({...old,id:old.id??stableProductId(row.id),dbId:row.id,name:row.name,price:Number(row.price||0),compare_at_price:row.compare_at_price==null?null:Number(row.compare_at_price),description:row.description||'',desc:row.description||'',stock:Number(row.stock||0),status:row.status,bestseller:!!row.bestseller,is_new:!!row.is_new,is_promo:!!row.is_promo,badge:row.badge||'',color:row.color||'Black',tags:Array.isArray(row.tags)?row.tags:[],images:(Array.isArray(row.image_urls)?row.image_urls:[]).filter(Boolean).length?(row.image_urls||[]).filter(Boolean).map(src=>({src,pos:'center'})):(old.images||[]),seo_title:row.seo_title||'',seo_description:row.seo_description||'',collections:productCollectionMap.get(row.id)||[],cat:old.cat||((row.tags||[]).find(t=>['symbol','dragon','wings','numbers','script'].includes(String(t).toLowerCase()))||'Tattoo')})});render()}catch(e){console.warn('Could not sync storefront catalog',e);products.forEach(normalizeProductImages);render()}}
+async function syncStorefrontProductImages(){
+  try{
+    const [pr,sr,rr,pc,cr]=await Promise.all([
+      supabaseRest("products?select=id,name,price,compare_at_price,description,stock,status,bestseller,is_new,is_promo,badge,color,tags,image_urls,seo_title,seo_description,created_at&status=eq.active&order=created_at.desc"),
+      supabaseRest("site_settings?select=announcement_text,logo_url,store_name,instagram_url,facebook_url,tiktok_url,hero_desktop_url,hero_mobile_url,hero_title,hero_subtitle,hero_button_text,story_desktop_url,story_image_url,story_mobile_url,shipping_fee&id=eq.true&limit=1"),
+      supabaseRest("reviews?select=product_id,rating,review_text,customer_name,approved,created_at&approved=eq.true&order=created_at.desc"),
+      supabaseRest("product_collections?select=product_id,collection_id"),
+      supabaseRest("collections?select=id,name,slug,status,sort_order&status=eq.active&order=sort_order.asc")
+    ]);
+    const oldByName=new Map(products.map(p=>[p.name,p]));
+    siteSettings={...siteSettings,...(sr[0]||{})};
+    shippingFee=Math.max(0,Number(siteSettings.shipping_fee??20));
+    reviews=Array.isArray(rr)?rr:[];
+    storeCollections=Array.isArray(cr)?cr:[];
+    const collectionNames=new Map(storeCollections.map(x=>[x.id,x.name]));
+    const productCollectionMap=new Map();
+    (Array.isArray(pc)?pc:[]).forEach(x=>{
+      const name=collectionNames.get(x.collection_id);
+      if(name){
+        const arr=productCollectionMap.get(x.product_id)||[];
+        arr.push(name);
+        productCollectionMap.set(x.product_id,arr);
+      }
+    });
+    products=(Array.isArray(pr)?pr:[]).map(row=>{
+      const old=oldByName.get(row.name)||{};
+      return normalizeProductImages({
+        ...old,id:old.id??stableProductId(row.id),dbId:row.id,name:row.name,
+        price:Number(row.price||0),
+        compare_at_price:row.compare_at_price==null?null:Number(row.compare_at_price),
+        description:row.description||"",desc:row.description||"",
+        stock:Number(row.stock||0),status:row.status,bestseller:!!row.bestseller,
+        is_new:!!row.is_new,is_promo:!!row.is_promo,badge:row.badge||"",
+        color:row.color||"Black",tags:Array.isArray(row.tags)?row.tags:[],
+        images:Array.isArray(row.image_urls)?row.image_urls.filter(Boolean).map(src=>({src,pos:"center"})):(old.images||[]),
+        seo_title:row.seo_title||"",seo_description:row.seo_description||"",
+        collections:productCollectionMap.get(row.id)||[],
+        cat:old.cat||((row.tags||[]).find(t=>["symbol","dragon","wings","numbers","script"].includes(String(t).toLowerCase()))||"Tattoo")
+      });
+    });
+    cacheStorefrontData();
+    render();
+  }catch(e){
+    console.warn("Could not sync storefront catalog",e);
+    products.forEach(normalizeProductImages);
+    render();
+  }
+}
 function getRecommendedProducts(p){const pool=products.filter(x=>x.id!==p.id&&x.status==="active"&&Number(x.stock)>0);const tags=new Set((p.tags||[]).map(t=>String(t).toLowerCase()));return pool.map(x=>{const xtags=(x.tags||[]).map(t=>String(t).toLowerCase());let score=0;if(x.cat&&p.cat&&x.cat===p.cat)score+=5;score+=xtags.filter(t=>tags.has(t)).length*3;if(x.bestseller)score+=2;return{x,score}}).sort((a,b)=>b.score-a.score).slice(0,4).map(r=>r.x)}
 function productReviewsHtml(p){const rows=reviews.filter(r=>r.product_id===p.dbId);if(!rows.length)return"";const avg=rows.reduce((s,r)=>s+Number(r.rating||0),0)/rows.length;return '<section class="reviews"><div class="kicker">Customer feedback</div><h2 style="font:600 42px/1 \\"Playfair Display\\",serif;margin:10px 0 8px">Reviews <span style="font:600 18px/1 \\"DM Sans\\",sans-serif;color:#777">★ '+avg.toFixed(1)+'</span></h2><div class="review-grid">'+rows.slice(0,6).map(r=>'<article class="review"><div class="stars">'+('★'.repeat(Number(r.rating||0)))+'</div><p>'+esc(r.review_text||'')+'</p><small>'+esc(r.customer_name||'Verified customer')+'</small></article>').join('')+'</div></section>'}
 function productView(p){normalizeProductImages(p);const inStock=Number(p.stock)>0;return `<div class="view active">${header()}<main class="product-page"><div class="breadcrumbs"><a href="#/" onclick="home();return false">Home</a> / ${esc(p.name)}</div><div class="product-layout"><div class="gallery"><div class="main-image"><img id="mainProductImg" src="${fastProductImage(p.images[0]?.src)}" data-pos="${p.images[0]?.pos||"center"}" alt="${esc(p.name)}" loading="eager" fetchpriority="high" decoding="async"><button class="zoom" onclick="openModal(document.getElementById('mainProductImg').src)">⌕</button></div><div class="thumbs">${(p.images||[]).map((u,i)=>`<button class="thumb ${i===0?"active":""}" onclick="setProductImage(${p.id},${i})"><img src="${fastProductImage(u.src)}" alt="" loading="lazy" decoding="async"></button>`).join("")}</div><p style="font-size:11px;color:#888;margin-top:12px"></p></div><div><div class="product-kicker">${esc(p.cat)} · ${esc(p.color)}</div><div class="product-status-inline">${p.bestseller?'<span class="status-tag status-bestseller">🔥 Best Seller</span>':''}${p.is_new?'<span class="status-tag status-new">New</span>':''}${p.is_promo?'<span class="status-tag status-promo">Promo</span>':''}</div><h1 class="product-title">${esc(p.name)}</h1><div class="product-price ${p.compare_at_price&&Number(p.compare_at_price)>Number(p.price)?"product-price-sale":""}"><span class="sale-price">${money(p.price)}</span>${p.compare_at_price&&Number(p.compare_at_price)>Number(p.price)?`<span class="compare-price">${money(p.compare_at_price)}</span><span class="sale-badge">Sale</span>`:""}</div><p class="product-copy">${esc(p.desc)}</p><div class="purchase-area"><div class="qty"><button onclick="changeQty(-1)">−</button><input id="productQty" value="1" inputmode="numeric" onchange="this.value=Math.max(1,parseInt(this.value)||1)"><button onclick="changeQty(1)">+</button></div><div class="buy-row"><button class="btn wide" ${inStock?"":"disabled style='opacity:.5;cursor:not-allowed'"} onclick="addToCart(${p.id},parseInt(document.getElementById('productQty').value)||1,this)">${inStock?"Add to cart":"Out of stock"}</button><button class="btn ghost wide" ${inStock?"":"disabled style='opacity:.5;cursor:not-allowed'"} onclick="buyNow(${p.id})">Order now</button></div><div class="notice">✓ Cash on delivery in Morocco<br>✓ Delivery details confirmed with your order<br>✓ No account required</div></div><div class="specs"><div class="spec"><b>Type</b><span>Temporary tattoo</span></div><div class="spec"><b>Color</b><span>${esc(p.color)}</span></div><div class="spec"><b>Delivery</b><span>Morocco · COD</span></div><div class="spec"><b>Quantity</b><span>Choose above</span></div></div><div class="accordion"><details open><summary>Product details <span>⌄</span></summary><p>Temporary tattoo design in black ink style. Apply only to clean, dry skin and avoid irritated or broken skin.</p></details><details id="delivery"><summary>Delivery & payment <span>⌄</span></summary><p>We deliver across Morocco. Payment is cash on delivery. Shipping cost and delivery timing are confirmed when your order is processed.</p></details><details><summary>Care <span>⌄</span></summary><p>Avoid heavy rubbing, oils and repeated soaking on the tattoo area to help preserve the design.</p></details></div></div></div><section class="recommendations"><div class="recommendations-head"><div class="kicker">More to explore</div><h2>You might also like</h2></div><div class="grid">${getRecommendedProducts(p).map(productCard).join("")}</div></section>${productReviewsHtml(p)}<div class="mobile-sticky-buy"><div class="mobile-sticky-buy-inner"><div class="mobile-sticky-qty"><button type="button" onclick="changeStickyQty(${p.id},-1)">−</button><span id="stickyQty-${p.id}">1</span><button type="button" onclick="changeStickyQty(${p.id},1)">+</button></div><button type="button" class="btn sticky-atc" onclick="addToCart(${p.id},getProductQty(),this)">ADD TO CART</button><button type="button" class="btn sticky-buy" onclick="buyNow(${p.id})">ORDER NOW</button></div></div></main>${footer()}</div>`;
@@ -471,7 +520,21 @@ function openModal(src){document.getElementById("modalImg").src=src;document.get
 function closeModal(){document.getElementById("imageModal").classList.remove("open")}
 function toast(t){const x=document.getElementById("toast");x.textContent=t;x.classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>x.classList.remove("show"),2200)}
 function legalView(type){const title={privacy:"Privacy Policy",terms:"Terms & Conditions",returns:"Returns & Exchanges",shipping:"Shipping Policy",contact:"Contact TATTO✦OUI"}[type]||"TATTO✦OUI";const body={privacy:'<h2>Privacy Policy</h2><p>We collect the information you provide when placing an order, such as your name, phone number, city and delivery address, so we can process and confirm your COD order.</p><h3>How we use your information</h3><p>We use order information to confirm orders, prepare delivery, provide customer support and maintain our store records. You do not need to create an account to place an order.</p><h3>Security</h3><p>Checkout is protected with Cloudflare Turnstile and orders are processed through our secure backend.</p><h3>Your choices</h3><p>For questions about your order information or to request an update, contact us through our official Instagram page.</p>',terms:'<h2>Terms & Conditions</h2><p>By placing an order on TATTO✦OUI, you confirm that the information you provide is accurate and that you understand the order is placed using cash on delivery.</p><h3>Orders</h3><p>Orders are subject to product availability. We may contact you to confirm your name, phone number, address and requested items before dispatch.</p><h3>Prices</h3><p>Prices are shown in Moroccan dirhams. Delivery charges are shown during checkout.</p><h3>Product use</h3><p>Temporary tattoos should be applied only to clean, intact skin and according to the product instructions. Stop use if irritation occurs.</p>',returns:'<h2>Returns & Exchanges</h2><p>If you receive a damaged, incorrect or materially different item, contact TATTO✦OUI as soon as possible with your order number and clear photos.</p><h3>Eligibility</h3><p>For change-of-mind requests, items should be unused and in their original condition. We will review each request and confirm the available return or exchange option before you send anything back.</p><h3>Contact first</h3><p>Please do not send a return without contacting us first. Return instructions depend on the order and delivery situation.</p>',shipping:'<h2>Shipping Policy</h2><p>We deliver across Morocco using cash on delivery. The delivery charge shown at checkout is added to your order total.</p><h3>Delivery timing</h3><p>Delivery timing can vary by city, carrier workload and order confirmation. We confirm the delivery details with you before dispatch.</p><h3>Address accuracy</h3><p>Please provide a complete city and area/address. If the courier cannot reach you because the information is incomplete or the phone number is unreachable, delivery may be delayed.</p>',contact:'<h2>Contact TATTO✦OUI</h2><p>For order confirmation, delivery questions, returns or general support, contact us through Instagram.</p><p><a class="btn" href="${siteSettings.instagram_url||"https://www.instagram.com/tattooui_/"}" target="_blank" rel="noopener">Message us on Instagram</a></p><p style="color:#777">When contacting us about an order, include your order number and the phone number used at checkout.</p>'}[type]||'';return '<div class="view active">'+header()+'<main class="checkout"><div class="kicker">TATTO✦OUI</div><h1>'+title+'</h1><div class="order-box" style="line-height:1.8;color:#555">'+body+'</div><a class="btn ghost" href="#/" onclick="home();return false">Back to store</a></main>'+footer()+'</div>'}
-function render(){const path=location.hash.replace(/^#/,"")||"/";let app=document.getElementById("app");if(path.startsWith("/product/")){const p=products.find(x=>x.id===Number(path.split("/")[2]));app.innerHTML=p?productView(p):homeView();if(p&&p.dbId)metaTrack("ViewContent",{content_ids:[String(p.dbId)],content_type:"product",content_name:p.name,value:Number(p.price),currency:"MAD"})}else if(path==="/checkout"){app.innerHTML=checkoutView()}else if(path.startsWith("/order-confirmed/")){app.innerHTML=confirmationView(path.split("/")[2]||"")}else if(["/privacy","/terms","/returns","/shipping","/contact"].includes(path)){app.innerHTML=legalView(path.slice(1))}else app.innerHTML=homeView();applyLanguage();updateBadge();renderCart()}
+function hydrateDeferredStory(){
+  const story=document.getElementById("story"),visual=story?.querySelector(".story-visual");
+  if(!story||!visual)return;
+  const load=()=>{
+    const url=window.matchMedia("(max-width:800px)").matches?story.dataset.storyMobile:story.dataset.storyDesktop;
+    if(url)visual.style.backgroundImage="url('"+String(url).replace(/'/g,"%27")+"')";
+  };
+  if("IntersectionObserver" in window){
+    const observer=new IntersectionObserver(entries=>{
+      if(entries.some(entry=>entry.isIntersecting)){load();observer.disconnect()}
+    },{rootMargin:"500px 0px"});
+    observer.observe(story);
+  }else load();
+}
+function render(){const path=location.hash.replace(/^#/,"")||"/";let app=document.getElementById("app");if(path.startsWith("/product/")){const p=products.find(x=>x.id===Number(path.split("/")[2]));app.innerHTML=p?productView(p):homeView();if(p&&p.dbId)metaTrack("ViewContent",{content_ids:[String(p.dbId)],content_type:"product",content_name:p.name,value:Number(p.price),currency:"MAD"})}else if(path==="/checkout"){app.innerHTML=checkoutView()}else if(path.startsWith("/order-confirmed/")){app.innerHTML=confirmationView(path.split("/")[2]||"")}else if(["/privacy","/terms","/returns","/shipping","/contact"].includes(path)){app.innerHTML=legalView(path.slice(1))}else app.innerHTML=homeView();applyLanguage();updateBadge();renderCart();hydrateDeferredStory()}
 function updateSEO(){
   const path=location.hash.replace(/^#/,"")||"/";
   const base="https://tattooui-store.pages.dev";
@@ -487,7 +550,7 @@ function updateSEO(){
   link.href=base+(p?"/#/product/"+p.id:"/");
   const schema=document.getElementById("storeStructuredData");
   if(schema){const data=p?{"@context":"https://schema.org","@type":"Product","name":p.name,"description":desc,"image":(p.images||[]).map(x=>x.src).filter(Boolean),"brand":{"@type":"Brand","name":"TATTO✦OUI"},"offers":{"@type":"Offer","priceCurrency":"MAD","price":Number(p.price),"availability":Number(p.stock)>0?"https://schema.org/InStock":"https://schema.org/OutOfStock","url":base+"/#/product/"+p.id}}:{"@context":"https://schema.org","@type":"WebSite","name":"TATTO✦OUI","url":base+"/","description":desc};schema.textContent=JSON.stringify(data)}
-}window.addEventListener("hashchange",()=>{resetTurnstile();render();updateSEO();if(location.hash==="#/checkout")setTimeout(renderTurnstile,120)});document.addEventListener("click",e=>{if(!e.target.closest(".language-switcher"))closeLanguageMenu()});window.addEventListener("scroll",()=>{const b=document.getElementById("backtop");if(b)b.classList.toggle("show",scrollY>600)});render();syncStorefrontProductImages();updateSEO();setTimeout(renderTurnstile,500);
+}window.addEventListener("hashchange",()=>{resetTurnstile();render();updateSEO();if(location.hash==="#/checkout")setTimeout(renderTurnstile,120)});restoreStorefrontCache();document.addEventListener("click",e=>{if(!e.target.closest(".language-switcher"))closeLanguageMenu()});window.addEventListener("scroll",()=>{const b=document.getElementById("backtop");if(b)b.classList.toggle("show",scrollY>600)});render();syncStorefrontProductImages();updateSEO();setTimeout(renderTurnstile,500);
 </script>
 </body>
 </html>
