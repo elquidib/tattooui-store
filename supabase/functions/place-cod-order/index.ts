@@ -1,24 +1,36 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://tattooui-store.pages.dev",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Content-Type": "application/json",
+const allowedOrigins = new Set([
+  "https://tattooui.com",
+  "https://www.tattooui.com",
+  "https://tattooui-store.pages.dev",
+]);
+
+const getCorsHeaders = (req: Request) => {
+  const origin = req.headers.get("Origin") || "";
+  const allowOrigin = allowedOrigins.has(origin) ? origin : "https://tattooui.com";
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+    "Content-Type": "application/json",
+  };
 };
 
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: corsHeaders });
+const json = (req: Request, body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: getCorsHeaders(req) });
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST") return json({ error: "Method not allowed." }, 405);
+  if (req.method !== "POST") return json(req, { error: "Method not allowed." }, 405);
 
   const turnstileSecret = Deno.env.get("TURNSTILE_SECRET_KEY");
   if (!turnstileSecret) {
     console.error("TURNSTILE_SECRET_KEY is not configured.");
-    return json({ error: "Checkout protection is not configured yet." }, 503);
+    return json(req, { error: "Checkout protection is not configured yet." }, 503);
   }
 
   let body: {
@@ -40,11 +52,11 @@ Deno.serve(async (req) => {
   try {
     body = await req.json();
   } catch {
-    return json({ error: "Invalid request." }, 400);
+    return json(req, { error: "Invalid request." }, 400);
   }
 
   const token = String(body?.turnstile_token || "");
-  if (!token) return json({ error: "Please complete the security check." }, 400);
+  if (!token) return json(req, { error: "Please complete the security check." }, 400);
 
   const remoteip = req.headers.get("CF-Connecting-IP") || "";
   const verifyBody = new URLSearchParams({
@@ -61,25 +73,25 @@ Deno.serve(async (req) => {
 
   if (!verifyResponse.ok) {
     console.error("Turnstile verification HTTP failure:", verifyResponse.status);
-    return json({ error: "Security check failed. Please try again." }, 403);
+    return json(req, { error: "Security check failed. Please try again." }, 403);
   }
 
   const verification = await verifyResponse.json();
   if (!verification.success) {
     console.warn("Turnstile rejected checkout:", verification["error-codes"] || []);
-    return json({ error: "Security check failed. Please try again." }, 403);
+    return json(req, { error: "Security check failed. Please try again." }, 403);
   }
 
   const order = body?.order;
   if (!order || !Array.isArray(order.p_items)) {
-    return json({ error: "Invalid order." }, 400);
+    return json(req, { error: "Invalid order." }, 400);
   }
 
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   if (!serviceRoleKey || !supabaseUrl) {
     console.error("Supabase server environment is incomplete.");
-    return json({ error: "Checkout service is temporarily unavailable." }, 503);
+    return json(req, { error: "Checkout service is temporarily unavailable." }, 503);
   }
 
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -99,7 +111,7 @@ Deno.serve(async (req) => {
 
   if (error) {
     console.error("COD order RPC error:", error);
-    return json({ error: error.message || "Could not place your order." }, 400);
+    return json(req, { error: error.message || "Could not place your order." }, 400);
   }
 
   const result = Array.isArray(data) ? data[0] : data;
@@ -138,7 +150,7 @@ Deno.serve(async (req) => {
           event_time: Math.floor(Date.now() / 1000),
           event_id: purchaseEventId,
           action_source: "website",
-          event_source_url: String(body.event_source_url || "https://tattooui-store.pages.dev/#/checkout"),
+          event_source_url: String(body.event_source_url || "https://tattooui.com/#/checkout"),
           user_data: userData,
           custom_data: {
             currency: "MAD",
@@ -189,5 +201,5 @@ Deno.serve(async (req) => {
     await sendMetaPurchase();
   }
 
-  return json({ data: result, purchase_event_id: purchaseEventId });
+  return json(req, { data: result, purchase_event_id: purchaseEventId });
 });
