@@ -3,6 +3,15 @@
 
 ALTER TABLE private.cod_rate_limits ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE private.cod_rate_limits FROM PUBLIC, anon, authenticated;
+DROP POLICY IF EXISTS "service role cod rate limits" ON private.cod_rate_limits;
+CREATE POLICY "service role cod rate limits"
+ON private.cod_rate_limits
+AS PERMISSIVE
+FOR ALL
+TO service_role
+USING (true)
+WITH CHECK (true);
+GRANT ALL ON TABLE private.cod_rate_limits TO service_role;
 
 DROP FUNCTION IF EXISTS public.place_cod_order(text,text,text,text,text,jsonb,text);
 
