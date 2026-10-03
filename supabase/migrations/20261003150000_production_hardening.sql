@@ -364,7 +364,7 @@ BEGIN
     WHERE c.id = NEW.customer_id;
   END IF;
 
-  RETURN COALESCE(NEW, OLD);
+  IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
 END;
 $function$;
 
