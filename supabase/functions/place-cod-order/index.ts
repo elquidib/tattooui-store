@@ -1,17 +1,29 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://tattooui-store.pages.dev",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Content-Type": "application/json",
+const allowedOrigins = new Set([
+  "https://tattooui.com",
+  "https://www.tattooui.com",
+  "https://tattooui-store.pages.dev",
+]);
+
+const getCorsHeaders = (req: Request) => {
+  const origin = req.headers.get("Origin") || "";
+  const allowOrigin = allowedOrigins.has(origin) ? origin : "https://tattooui.com";
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+    "Content-Type": "application/json",
+  };
 };
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: corsHeaders });
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Method not allowed." }, 405);
 
@@ -138,7 +150,7 @@ Deno.serve(async (req) => {
           event_time: Math.floor(Date.now() / 1000),
           event_id: purchaseEventId,
           action_source: "website",
-          event_source_url: String(body.event_source_url || "https://tattooui-store.pages.dev/#/checkout"),
+          event_source_url: String(body.event_source_url || "https://tattooui.com/#/checkout"),
           user_data: userData,
           custom_data: {
             currency: "MAD",
