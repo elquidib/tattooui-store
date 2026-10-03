@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://tattooui-store.pages.dev/sitemap.xml
+Sitemap: https://tattooui.com/sitemap.xml
