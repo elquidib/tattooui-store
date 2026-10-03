@@ -41,6 +41,29 @@ jobs:
           PY
           node --check /tmp/admin.js
 
+      - name: Run admin smoke assertions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html=Path("admin/index.html").read_text()
+          required=[
+            "async function isAdmin()",
+            "async function loadProducts()",
+            "async function loadOrders()",
+            "async function loadCustomers()",
+            "async function loadReviews()",
+            "async function loadDiscounts()",
+            "async function saveDiscount()",
+            "async function saveOrderStatus(",
+            "products.map(p=>'<option value="'+p.id",
+            "db.auth.onAuthStateChange",
+          ]
+          for item in required:
+            assert item in html, f"Missing admin requirement: {item}"
+          assert "p.dbId" not in html, "Stale product identifier binding remains in admin"
+          print("Admin smoke checks passed")
+          PY
+
       - name: Run storefront smoke assertions
         run: |
           python - <<'PY'
