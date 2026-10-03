@@ -358,9 +358,9 @@ function localizedAnnouncement(){
   const value=String(siteSettings.announcement_text||"").trim();
   const normalized=value.toLowerCase().replace(/\\s+/g," ");
   if(normalized.includes("free delivery")&&normalized.includes("160")){
-    if(currentLanguage==="fr")return "Livraison gratuite pour toute commande de plus de 160 DH";
-    if(currentLanguage==="ar")return "التوصيل مجاني لطلبات أكثر من 160 درهم";
-    return "Free delivery on orders over 160 DH";
+    if(currentLanguage==="fr")return "Livraison gratuite dès 160 DH";
+    if(currentLanguage==="ar")return "التوصيل مجاني ابتداءً من 160 درهم";
+    return "Free delivery on orders of 160 DH or more";
   }
   return translateString(value||"Cash on delivery in Morocco");
 }
