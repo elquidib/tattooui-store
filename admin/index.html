@@ -209,7 +209,7 @@ function getWhatsAppRecipient(){
   return digits;
 }
 function formatConfirmedOrderMessage(o){
-  return 'Name: '+(o.customer_name||'—')+'\nPhone: '+(o.phone||'—')+'\nCity: '+(o.city||'—')+'\nAddress: '+(o.address||'—')+'\nNotes: '+(o.notes||'—')+'\nTotal: '+num(o.total)+' DH';
+  return 'Name: '+(o.customer_name||'—')+'\nPhone: '+(o.phone||'—')+'\nCity: '+(o.city||'—')+'\nAddress: '+(o.address||'—')+'\nTotal: '+num(o.total)+' DH';
 }
 function openWhatsAppForAdmin(id){
   const o=orders.find(x=>x.id===id);
