@@ -209,10 +209,7 @@ function getWhatsAppRecipient(){
   return digits;
 }
 function formatConfirmedOrderMessage(o){
-  const items=orderItems.filter(i=>i.order_id===o.id);
-  const lines=items.map(i=>'• '+(i.product_name||'Product')+' × '+num(i.quantity)+' — '+num(i.unit_price)+' DH/unit — '+num(i.line_total)+' DH').join('\n');
-  const date=o.created_at?new Date(o.created_at).toLocaleString('en-GB'):'';
-  return '📦 TATTO✦OUI — CONFIRMED ORDER\n\nOrder: #'+o.order_number+'\nDate: '+date+'\nStatus: CONFIRMED\n\nCUSTOMER\nName: '+(o.customer_name||'—')+'\nPhone: '+(o.phone||'—')+'\nCity: '+(o.city||'—')+'\nAddress: '+(o.address||'—')+'\n'+(o.notes?'Notes: '+o.notes+'\n':'')+'\nPRODUCTS\n'+(lines||'No item details available')+'\n\nSubtotal: '+num(o.subtotal)+' DH\nDiscount'+(o.discount_code?' ('+o.discount_code+')':'')+': −'+num(o.discount_amount||0)+' DH\nDelivery: '+num(o.shipping)+' DH\nTOTAL COD TO COLLECT: '+num(o.total)+' DH\n\nPayment: Cash on Delivery';
+  return 'Name: '+(o.customer_name||'—')+'\nPhone: '+(o.phone||'—')+'\nCity: '+(o.city||'—')+'\nAddress: '+(o.address||'—')+'\nNotes: '+(o.notes||'—')+'\nTotal: '+num(o.total)+' DH';
 }
 function openWhatsAppForAdmin(id){
   const o=orders.find(x=>x.id===id);
