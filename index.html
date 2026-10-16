@@ -342,21 +342,32 @@ let currentProduct = null, currentImg = 0, filter="All", searchTerm="";
 const money=n=>`${n.toLocaleString("fr-MA")} DH`;
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 
-function fastSupabaseImage(src,quality=75){
+function fastSupabaseImage(src,width=1200,height=1200,quality=78){
   const value=String(src||"").trim();
   if(!value)return NO_IMAGE;
   try{
     const u=new URL(value);
-    if(u.hostname.endsWith("supabase.co")&&u.pathname.includes("/storage/v1/object/public/")){
-      u.pathname=u.pathname.replace("/storage/v1/object/public/","/storage/v1/render/image/public/");
-      u.search="?quality="+quality;
-      return u.toString();
+    if(u.hostname.endsWith("supabase.co")){
+      const objectPath="/storage/v1/object/public/";
+      const renderPath="/storage/v1/render/image/public/";
+      if(u.pathname.includes(objectPath)){
+        u.pathname=u.pathname.replace(objectPath,renderPath);
+      }
+      if(u.pathname.includes(renderPath)){
+        u.searchParams.set("width",String(width));
+        u.searchParams.set("height",String(height));
+        u.searchParams.set("quality",String(quality));
+        u.searchParams.set("resize","contain");
+        u.searchParams.set("format","webp");
+        return u.toString();
+      }
     }
   }catch(e){}
   return value;
 }
-function fastProductImage(src){return fastSupabaseImage(src,75)}
-function fastSiteImage(src){return fastSupabaseImage(src,72)}
+function fastProductImage(src){return fastSupabaseImage(src,1200,1200,78)}
+function fastProductThumbImage(src){return fastSupabaseImage(src,420,420,68)}
+function fastSiteImage(src,width=1440,height=1200,quality=72){return fastSupabaseImage(src,width,height,quality)}
 function localizedAnnouncement(){
   const value=String(siteSettings.announcement_text||"").trim();
   const normalized=value.toLowerCase().replace(/\\s+/g," ");
@@ -417,14 +428,14 @@ if(p.bestseller)badges.push('<span class="status-tag status-bestseller">🔥 Bes
 if(p.is_new)badges.push('<span class="status-tag status-new">New</span>');
 if(p.is_promo)badges.push('<span class="status-tag status-promo">Promo</span>');
 if(!badges.length&&p.badge)badges.push(`<span class="status-tag status-custom">${esc(p.badge)}</span>`);
-return `<article class="card" onclick="openProduct(${p.id})"><div class="card-media"><img src="${fastProductImage(p.images[0]?.src)}" alt="${esc(p.name)}" loading="lazy" decoding="async">${badges.length?`<div class="product-status-tags">${badges.join("")}</div>`:""}<button class="quick" onclick="event.stopPropagation();addToCart(${p.id},1,this)">+</button></div><div class="card-info"><div class="card-title">${esc(p.name)}</div><div class="meta">${esc(p.cat)} · ${esc(p.color)}</div><div class="price">${p.compare_at_price&&Number(p.compare_at_price)>Number(p.price)?`<span class="price-sale"><span class="sale-price">${money(p.price)}</span><span class="compare-price">${money(p.compare_at_price)}</span></span>`:`${money(p.price)}`}${p.compare_at_price&&Number(p.compare_at_price)>Number(p.price)?`<span class="sale-badge">Sale</span>`:""}</div></div></article>`;
+return `<article class="card" onclick="openProduct(${p.id})"><div class="card-media"><img src="${fastProductThumbImage(p.images[0]?.src)}" alt="${esc(p.name)}" width="420" height="420" loading="lazy" decoding="async">${badges.length?`<div class="product-status-tags">${badges.join("")}</div>`:""}<button class="quick" onclick="event.stopPropagation();addToCart(${p.id},1,this)">+</button></div><div class="card-info"><div class="card-title">${esc(p.name)}</div><div class="meta">${esc(p.cat)} · ${esc(p.color)}</div><div class="price">${p.compare_at_price&&Number(p.compare_at_price)>Number(p.price)?`<span class="price-sale"><span class="sale-price">${money(p.price)}</span><span class="compare-price">${money(p.compare_at_price)}</span></span>`:`${money(p.price)}`}${p.compare_at_price&&Number(p.compare_at_price)>Number(p.price)?`<span class="sale-badge">Sale</span>`:""}</div></div></article>`;
 }
 function homeView(){
 let cats=["All","Best Seller","New","Promo"];
 let list=products.filter(p=>(filter==="All"||(filter==="Best Seller"&&p.bestseller)||(filter==="New"&&p.is_new)||(filter==="Promo"&&p.is_promo) )&&(!searchTerm||[p.name,p.cat,...p.tags,...(p.collections||[])].join(" ").toLowerCase().includes(searchTerm.toLowerCase())));
 const heroDesktop=String(siteSettings.hero_desktop_url||"").trim();
 const heroMobile=String(siteSettings.hero_mobile_url||heroDesktop).trim();
-const heroMedia=heroDesktop?'<div class="hero-media"><picture><source media="(max-width: 800px)" srcset="'+esc(fastSiteImage(heroMobile))+'"><img src="'+esc(fastSiteImage(heroDesktop))+'" alt="Fashion portrait showcasing a temporary tattoo style" fetchpriority="high" loading="eager" decoding="async"></picture></div>':"";
+const heroMedia=heroDesktop?'<div class="hero-media"><picture><source media="(max-width: 800px)" srcset="'+esc(fastSiteImage(heroMobile,760,1000,72))+'"><img src="'+esc(fastSiteImage(heroDesktop,1600,1200,74))+'" alt="Fashion portrait showcasing a temporary tattoo style" fetchpriority="high" loading="eager" decoding="async"></picture></div>':"";
 return `<div id="homeView" class="view active">${header()}
 <section class="hero ${heroDesktop?"has-image":""}">${heroMedia}<div class="hero-inner"><div class="eyebrow">Temporary tattoos · made for your mood</div><h1>${esc(siteSettings.hero_title||"Make your mark.")}</h1><p>${esc(siteSettings.hero_subtitle||"Express yourself without the commitment. Discover temporary tattoos designed to make every look feel a little more yours.")}</p><a class="btn light" href="#/" onclick="goToShop();return false">${esc(siteSettings.hero_button_text||"Shop the collection")}</a></div></section>
 <div class="trust" id="trust"><div>Easy to apply<span>Simple, no appointment</span></div><div>Easy to change<span>New style when you want</span></div><div>Cash on delivery<span>Order across Morocco</span></div><div>Made for Morocco<span>Delivery nationwide</span></div></div>
