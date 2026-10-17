@@ -95,6 +95,9 @@ Deno.serve(async (req) => {
   }
 
   const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    // Use a custom header for the trusted client IP. Do not forward CF-Connecting-IP
+    // to Supabase's API gateway; Cloudflare rejects that reserved header with Error 1000.
+    global: { headers: remoteip ? { "x-client-ip": remoteip } : {} },
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
