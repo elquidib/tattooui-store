@@ -229,6 +229,13 @@ async function deleteCollection(){const id=$('collectionId').value;if(!id)return
 async function loadOrders(){const r=await db.from('orders').select('*').order('created_at',{ascending:false});if(r.error){alert(r.error.message);return}orders=r.data||[];const ids=orders.map(o=>o.id);if(ids.length){const ir=await db.from('order_items').select('*').in('order_id',ids);if(ir.error){alert(ir.error.message);return}orderItems=ir.data||[]}else orderItems=[];renderOrders();renderOrderStats();renderAnalytics();renderWhatsAppOrders();if($('orderTitle')&&$('orderTitle').textContent!=='Select an order'&&window.selectedOrderId){renderOrderDetail(window.selectedOrderId)}}
 function renderAnalytics(){const range=$('analyticsRange')?.value||'30';const cutoff=range==='all'?0:Date.now()-Number(range)*86400000;const valid=orders.filter(o=>!['cancelled','returned'].includes(o.status)&&new Date(o.created_at).getTime()>=cutoff);const revenue=valid.reduce((s,o)=>s+Number(o.total||0),0);const delivered=valid.filter(o=>o.status==='delivered').reduce((s,o)=>s+Number(o.total||0),0);$('anOrders').textContent=valid.length;$('anRevenue').textContent=num(revenue)+' DH';$('anAov').textContent=num(valid.length?revenue/valid.length:0)+' DH';$('anDelivered').textContent=num(delivered)+' DH';const ids=new Set(valid.map(o=>o.id));const pm=new Map();orderItems.filter(i=>ids.has(i.order_id)).forEach(i=>{const x=pm.get(i.product_name)||{units:0,value:0};x.units+=Number(i.quantity||0);x.value+=Number(i.line_total||0);pm.set(i.product_name,x)});$('anProducts').innerHTML=[...pm.entries()].sort((a,b)=>b[1].value-a[1].value).slice(0,10).map(([name,x])=>'<tr><td>'+esc(name)+'</td><td>'+num(x.units)+'</td><td>'+num(x.value)+' DH</td></tr>').join('')||'<tr><td colspan="3" class="muted">No sales in this period.</td></tr>';const cm=new Map();valid.forEach(o=>{const key=o.city||'Unknown';const x=cm.get(key)||{orders:0,value:0};x.orders++;x.value+=Number(o.total||0);cm.set(key,x)});$('anCities').innerHTML=[...cm.entries()].sort((a,b)=>b[1].value-a[1].value).slice(0,10).map(([city,x])=>'<tr><td>'+esc(city)+'</td><td>'+num(x.orders)+'</td><td>'+num(x.value)+' DH</td></tr>').join('')||'<tr><td colspan="3" class="muted">No orders in this period.</td></tr>'}
 function renderOrderStats(){const count=s=>orders.filter(o=>o.status===s).length;['new','confirmed','shipped','delivered'].forEach(s=>{const el=$('orderStat'+s.charAt(0).toUpperCase()+s.slice(1));if(el)el.textContent=count(s)})}
+function normalizeLadyLogPhone(raw){
+ let digits=String(raw??'').replace(/\D/g,'');
+ if(digits.startsWith('00'))digits=digits.slice(2);
+ if(digits.startsWith('212')&&digits.length===12)digits='0'+digits.slice(3);
+ if((digits.startsWith('6')||digits.startsWith('7'))&&digits.length===9)digits='0'+digits;
+ return digits;
+}
 function exportConfirmedLadyLog(){
  const confirmed=orders.filter(o=>o.status==='confirmed');
  if(!confirmed.length){alert('No confirmed orders to export.');return}
@@ -238,7 +245,7 @@ function exportConfirmedLadyLog(){
   const items=orderItems.filter(i=>i.order_id===o.id);
   const merchandise=items.map(i=>String(i.product_name||'Article')+' x'+Number(i.quantity||1)).join(' ; ');
   const qty=items.reduce((sum,i)=>sum+Number(i.quantity||0),0);
-  return ['',String(o.customer_name||''),String(o.phone||''),String(o.address||''),Number(o.total||0),String(o.city||''),[o.notes||'','Commande Tattooui #'+o.order_number].filter(Boolean).join(' | '),merchandise,qty,'Non','Non'];
+  return ['',String(o.customer_name||''),normalizeLadyLogPhone(o.phone),String(o.address||''),Number(o.total||0),String(o.city||''),[o.notes||'','Commande Tattooui #'+o.order_number].filter(Boolean).join(' | '),merchandise,qty,'Non','Non'];
  });
  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
  ws['!cols']=[{wch:16},{wch:28},{wch:18},{wch:38},{wch:12},{wch:20},{wch:30},{wch:45},{wch:8},{wch:15},{wch:18}];
