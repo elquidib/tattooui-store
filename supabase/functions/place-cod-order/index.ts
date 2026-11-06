@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const { data, error } = await supabase.rpc("place_cod_order", {
+  const { data, error } = await supabase.rpc("place_cod_order_with_bundle", {
     p_customer_name: order.p_customer_name,
     p_phone: order.p_phone,
     p_city: order.p_city,
@@ -163,7 +163,7 @@ Deno.serve(async (req) => {
               : [],
             content_type: "product",
             num_items: Array.isArray(order.p_items)
-              ? order.p_items.reduce((sum: number, item: any) => sum + Number(item?.quantity || 0), 0)
+              ? order.p_items.reduce((sum: number, item: any) => sum + Number(item?.quantity || 0) + (item?.bundle_offer ? 1 : 0), 0)
               : 0,
             order_id: String(result.order_number || ""),
           },
