@@ -147,6 +147,15 @@
     return nativeFetch(input, init);
   };
 
+  const originalMetaTrack = metaTrack;
+  metaTrack = function(eventName, params = {}, options = {}) {
+    if (eventName === "Purchase") {
+      const gifts = cart.filter(row => row.bundleOffer).length;
+      if (gifts) params = { ...params, num_items: Number(params.num_items || 0) + gifts };
+    }
+    return originalMetaTrack(eventName, params, options);
+  };
+
   const nativeStorageSet = Storage.prototype.setItem;
   Storage.prototype.setItem = function(key, value) {
     if (key === "tattooui-last-order") {
