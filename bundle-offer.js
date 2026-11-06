@@ -48,8 +48,8 @@
     const p = products.find(x => x.id === id);
     if (!eligible(p)) { toast(currentLanguage === "ar" ? "هذا العرض غير متوفر حالياً" : "This offer is no longer available"); return false; }
     const row = cart.find(x => x.id === id);
-    if (row) { row.qty = 2; row.bundleOffer = true; row.bundlePrice = offerPrice(); }
-    else cart.push({ id, qty: 2, bundleOffer: true, bundlePrice: offerPrice() });
+    if (row) { row.qty = 2; row.bundleOffer = true; delete row.bundlePrice; }
+    else cart.push({ id, qty: 2, bundleOffer: true });
     localStorage.setItem("tattooui-cart", JSON.stringify(cart));
     updateBadge(); closeCart(); closeMobileMenu(); history.replaceState(null, "", "#/checkout"); resetTurnstile();
     render(); window.scrollTo(0, 0); setTimeout(renderTurnstile, 120); return true;
@@ -65,7 +65,7 @@
     return cart.reduce((sum, row) => {
       const p = products.find(x => x.id === row.id); if (!p) return sum;
       if (row.bundleOffer && !eligible(p)) { row.bundleOffer = false; delete row.bundlePrice; row.qty = 2; }
-      return sum + (row.bundleOffer ? Number(row.bundlePrice || offerPrice()) : Number(p.price) * Number(row.qty || 0));
+      return sum + (row.bundleOffer ? offerPrice() : Number(p.price) * Number(row.qty || 0));
     }, 0);
   };
   const oldUpdateQty = updateCartQty;
