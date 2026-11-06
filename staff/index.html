@@ -27,7 +27,7 @@ label{display:block;font-size:13px;font-weight:800;margin:12px 0 6px}
 input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}
 .primary{background:#111;color:#fff;width:100%;margin-top:16px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .tab{background:#ebe8e1;color:#333}.tab.active{background:#111;color:#fff}
-.order-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.order-picker{margin-bottom:12px}.picker-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:48px;padding:10px 14px;background:#fff;border:1px solid var(--line);border-radius:13px;color:#222}.picker-toggle b{font-size:14px}.picker-toggle span{font-size:12px;color:var(--muted)}.picker-strip{display:flex;gap:7px;overflow-x:auto;overscroll-behavior-x:contain;padding:9px 2px 5px;scrollbar-width:none}.picker-strip::-webkit-scrollbar{display:none}.order-chip{flex:0 0 auto;min-width:54px;min-height:39px;padding:8px 11px;border-radius:10px;background:#f0eee9;color:#333;font-size:13px}.order-chip.selected{background:#171717;color:#fff}.order-chip.follow{outline:1px solid #e4c66f}.order-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
 .order-no{font-size:12px;color:var(--muted);font-weight:800}
 .pill{background:#fff4d7;color:#775300;padding:6px 10px;border-radius:99px;font-size:11px;font-weight:800}
 .customer{font-size:22px;font-weight:900;margin-bottom:12px}
@@ -77,7 +77,7 @@ input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;ba
  if(!cfg||!window.supabase){document.getElementById('loginError').textContent='تعذر الاتصال بالخدمة. يرجى تحديث الصفحة.';return;}
  const db=window.supabase.createClient(cfg.url,cfg.publishableKey);
  const $=id=>document.getElementById(id);
- let newOrders=[],followOrders=[],items=[],activeTab='new',busy=false;
+ let newOrders=[],followOrders=[],items=[],activeTab='new',busy=false,selectedId=null,pickerOpen=false;
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const money=v=>Number(v||0).toLocaleString('fr-FR',{maximumFractionDigits:2})+' DH';
  function say(msg,type){$('message').innerHTML=msg?'<div class="panel '+(type==='error'?'error':'success')+'">'+esc(msg)+'</div>':'';}
@@ -97,24 +97,31 @@ input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;ba
    '<div class="total"><span>المجموع</span><span>'+money(o.total)+'</span></div>'+
    '<div class="actions"><button class="confirm" data-action="confirmed" data-id="'+esc(o.id)+'">تأكيد الطلب</button><button class="cancel" data-action="cancelled" data-id="'+esc(o.id)+'">إلغاء الطلب</button><button class="later" data-action="later" data-id="'+esc(o.id)+'">الاتصال لاحقاً</button></div></article>';
  }
+ function orderLabel(o){return o.order_number??String(o.id).slice(0,6);}
  function render(){
   $('newCount').textContent=newOrders.length;$('followCount').textContent=followOrders.length;
-  const current=newOrders[0];
-  $('newContent').innerHTML=current?'<div class="notice">نعرض الطلبات من الأقدم إلى الأحدث. بعد حفظ القرار سيظهر الطلب التالي تلقائياً. <b>المتبقي: '+newOrders.length+'</b></div>'+card(current,false):'<div class="panel empty"><b>لا توجد طلبات جديدة</b>ستظهر هنا الطلبات التي تحتاج إلى التأكيد.</div>';
-  $('followContent').innerHTML=followOrders.length?followOrders.map(o=>card(o,true)).join(''):'<div class="panel empty"><b>لا توجد اتصالات مؤجلة</b>الطلبات التي تختارين لها الاتصال لاحقاً ستظهر هنا.</div>';
+  const allPending=[...newOrders,...followOrders].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  if(!allPending.some(o=>o.id===selectedId))selectedId=allPending[0]?.id??null;
+  const selected=allPending.find(o=>o.id===selectedId);
+  const isFollow=selected?followOrders.some(o=>o.id===selected.id):false;
+  const picker='<div class="order-picker"><button id="pickerToggle" class="picker-toggle" type="button"><b>طلب '+(selected?esc(orderLabel(selected)):'—')+'　⌄</b><span>'+allPending.length+' طلب متاح · الأحدث أولاً</span></button>'+
+   (pickerOpen?'<div class="picker-strip" aria-label="اختيار الطلب">'+allPending.map(o=>'<button type="button" class="order-chip '+(o.id===selectedId?'selected':'')+' '+(followOrders.some(f=>f.id===o.id)?'follow':'')+'" data-select-order="'+esc(o.id)+'">'+esc(orderLabel(o))+'</button>').join('')+'</div>':'')+'</div>';
+  $('newContent').innerHTML=picker+(selected?'<div class="notice">اختاري أي رقم من القائمة لفتح الطلب مباشرة. الطلبات مرتبة من الأحدث إلى الأقدم.</div>'+card(selected,isFollow):'<div class="panel empty"><b>لا توجد طلبات معلّقة</b>ستظهر هنا الطلبات الجديدة واتصالات المتابعة.</div>');
+  $('followContent').innerHTML=followOrders.length?followOrders.map(o=>'<div class="listrow" data-follow-open="'+esc(o.id)+'"><div><b>طلب '+esc(orderLabel(o))+' · '+esc(o.customer_name||'بدون اسم')+'</b><small>'+esc(o.city||'')+'</small></div><span>فتح ←</span></div>').join(''):'<div class="panel empty"><b>لا توجد اتصالات مؤجلة</b>الطلبات التي تختارين لها الاتصال لاحقاً ستظهر هنا.</div>';
+  const toggle=$('pickerToggle');if(toggle)toggle.addEventListener('click',()=>{pickerOpen=!pickerOpen;render();});
+  document.querySelectorAll('[data-select-order]').forEach(b=>b.addEventListener('click',()=>{selectedId=b.dataset.selectOrder;pickerOpen=false;setTab('new');render();}));
+  document.querySelectorAll('[data-follow-open]').forEach(b=>b.addEventListener('click',()=>{selectedId=b.dataset.followOpen;setTab('new');render();}));
  }
  async function load(){
   say('');
-  const fr=await db.from('staff_order_followups').select('order_id,updated_at').order('updated_at',{ascending:true});
+  const fr=await db.from('staff_order_followups').select('order_id,updated_at').order('updated_at',{ascending:false});
   if(fr.error){say('تعذر تحميل قائمة الاتصال لاحقاً: '+fr.error.message,'error');return;}
   const fids=(fr.data||[]).map(x=>x.order_id);
-  let q=db.from('orders').select('id,order_number,customer_name,phone,city,address,notes,total,status,created_at').eq('status','new').order('created_at',{ascending:true});
-  const nr=await q;
+  const nr=await db.from('orders').select('id,order_number,customer_name,phone,city,address,notes,total,status,created_at').eq('status','new').order('created_at',{ascending:false});
   if(nr.error){say('تعذر تحميل الطلبات: '+nr.error.message,'error');return;}
   const all=nr.data||[];
-  newOrders=all.filter(o=>!fids.includes(o.id));
-  followOrders=fids.length?all.filter(o=>fids.includes(o.id)):[]; 
-  const ids=[...new Set(all.map(o=>o.id))];
+  newOrders=all.filter(o=>!fids.includes(o.id));followOrders=all.filter(o=>fids.includes(o.id));
+  const ids=all.map(o=>o.id);
   if(ids.length){const ir=await db.from('order_items').select('order_id,product_name,quantity,line_total').in('order_id',ids);if(ir.error){say('تعذر تحميل تفاصيل المنتجات: '+ir.error.message,'error');return;}items=ir.data||[];}else items=[];
   render();
  }
@@ -128,6 +135,7 @@ input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;ba
   const r=await db.rpc(rpc,args);
   setBusy(false);
   if(r.error){say('لم يتم حفظ التغيير: '+r.error.message,'error');return;}
+  selectedId=null;pickerOpen=false;
   say(action==='confirmed'?'تم تأكيد الطلب بنجاح.':action==='cancelled'?'تم إلغاء الطلب.':'تمت إضافة الطلب إلى قائمة الاتصال لاحقاً.','success');
   await load();
  }
