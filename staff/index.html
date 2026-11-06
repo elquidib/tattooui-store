@@ -99,7 +99,8 @@ input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;ba
  }
  function render(){
   $('newCount').textContent=newOrders.length;$('followCount').textContent=followOrders.length;
-  $('newContent').innerHTML=newOrders.length?newOrders.map(o=>card(o,false)).join(''):'<div class="panel empty"><b>لا توجد طلبات جديدة</b>ستظهر هنا الطلبات التي تحتاج إلى التأكيد.</div>';
+  const current=newOrders[0];
+  $('newContent').innerHTML=current?'<div class="notice">نعرض الطلبات من الأقدم إلى الأحدث. بعد حفظ القرار سيظهر الطلب التالي تلقائياً. <b>المتبقي: '+newOrders.length+'</b></div>'+card(current,false):'<div class="panel empty"><b>لا توجد طلبات جديدة</b>ستظهر هنا الطلبات التي تحتاج إلى التأكيد.</div>';
   $('followContent').innerHTML=followOrders.length?followOrders.map(o=>card(o,true)).join(''):'<div class="panel empty"><b>لا توجد اتصالات مؤجلة</b>الطلبات التي تختارين لها الاتصال لاحقاً ستظهر هنا.</div>';
  }
  async function load(){
