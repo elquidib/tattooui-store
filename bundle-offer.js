@@ -51,6 +51,8 @@
   window.buyBundleNow = function(id) {
     const p = products.find(x => x.id === id);
     if (!eligible(p)) { toast(currentLanguage === "ar" ? "هذا العرض غير متوفر حالياً" : "This offer is no longer available"); return false; }
+    const otherBundle = cart.find(x => x.bundleOffer && x.id !== id);
+    if (otherBundle) { toast(currentLanguage === "ar" ? "يمكنك اختيار عرض واحد فقط في الطلب الواحد." : "Only one bundle offer can be used per order."); return false; }
     const row = cart.find(x => x.id === id);
     if (row) { row.qty = 2; row.bundleOffer = true; delete row.bundlePrice; }
     else cart.push({ id, qty: 2, bundleOffer: true });
