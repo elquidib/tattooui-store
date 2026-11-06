@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Tattooui | تأكيد الطلبات</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="../favicon.svg">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../supabase-config.js"></script>
+<style>
+:root{color-scheme:light;--ink:#171717;--muted:#777;--line:#e9e5de;--paper:#f7f6f2;--white:#fff;--green:#16794b;--red:#b42318;--amber:#946200}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+button,input{font:inherit}button{border:0;border-radius:14px;padding:15px 18px;font-weight:800;cursor:pointer;min-height:52px}button:disabled{opacity:.55;cursor:wait}
+.shell{max-width:620px;margin:auto;padding:16px 14px calc(28px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 2px 18px}
+.brand{font-weight:900;letter-spacing:.08em;font-size:19px}.brand span{padding:0 3px}
+.sub{font-size:12px;color:var(--muted);margin-top:3px}
+.smallbtn{min-height:40px;padding:9px 13px;background:#eeeae3;color:#222;border-radius:11px;font-size:13px}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 4px 18px #00000005}
+h1,h2,h3,p{margin-top:0}h1{font-size:22px;margin-bottom:7px}h2{font-size:18px;margin-bottom:12px}
+.muted{color:var(--muted)}.error{color:var(--red);font-size:13px}.success{color:var(--green);font-size:13px}
+label{display:block;font-size:13px;font-weight:800;margin:12px 0 6px}
+input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.primary{background:#111;color:#fff;width:100%;margin-top:16px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.tab{background:#ebe8e1;color:#333}.tab.active{background:#111;color:#fff}
+.order-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.order-no{font-size:12px;color:var(--muted);font-weight:800}
+.pill{background:#fff4d7;color:#775300;padding:6px 10px;border-radius:99px;font-size:11px;font-weight:800}
+.customer{font-size:22px;font-weight:900;margin-bottom:12px}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.info div{background:#faf9f6;border:1px solid var(--line);padding:11px;border-radius:12px;min-width:0}
+.info small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
+.info strong{font-size:14px;overflow-wrap:anywhere}
+.address{grid-column:1/-1}
+.products{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.product-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0}
+.total{display:flex;justify-content:space-between;border-top:1px dashed var(--line);padding-top:12px;margin-top:6px;font-weight:900;font-size:18px}
+.call{display:flex;align-items:center;justify-content:center;gap:8px;background:#eaf5ee;color:#176b42;text-decoration:none;border-radius:14px;padding:15px;font-weight:900;margin-top:14px;min-height:52px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.confirm{background:#147849;color:white}.cancel{background:#fff0ee;color:#ad261d}.later{grid-column:1/-1;background:#fff4d7;color:#805600}
+.empty{text-align:center;padding:36px 16px;color:var(--muted)}.empty b{display:block;color:#222;font-size:17px;margin-bottom:6px}
+.hidden{display:none!important}.loading{text-align:center;color:var(--muted);padding:30px}
+.listrow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.listrow:last-child{border:0}.listrow b{display:block}.listrow small{color:var(--muted)}
+.notice{background:#fff8e7;color:#775300;border-radius:12px;padding:12px;font-size:12px;line-height:1.6;margin-bottom:12px}
+@media(max-width:360px){.info{grid-template-columns:1fr}.address{grid-column:auto}.actions{grid-template-columns:1fr}.later{grid-column:auto}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header><div><div class="brand">TATTO<span>✦</span>OUI</div><div class="sub">لوحة تأكيد الطلبات</div></div><button id="logoutBtn" class="smallbtn hidden" type="button">خروج</button></header>
+
+<section id="loginPanel" class="panel">
+<h1>مرحباً بك</h1><p class="muted">سجّلي الدخول للبدء في تأكيد الطلبات.</p>
+<form id="loginForm">
+<label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" required>
+<label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" required>
+<button class="primary" id="loginBtn">دخول</button><p id="loginError" class="error"></p>
+</form>
+</section>
+
+<main id="app" class="hidden">
+<div class="panel" style="padding:14px 16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><b id="staffName">فريق تأكيد الطلبات</b><div class="sub">اختاري الطلب واتصلي بالزبون</div></div><button id="refreshBtn" class="smallbtn" type="button">تحديث</button></div></div>
+<div class="tabs"><button class="tab active" id="newTab" type="button">طلبات جديدة <span id="newCount">0</span></button><button class="tab" id="followTab" type="button">اتصال لاحقاً <span id="followCount">0</span></button></div>
+<div id="message" aria-live="polite"></div>
+<section id="newView"><div id="newContent" class="loading">جاري تحميل الطلبات…</div></section>
+<section id="followView" class="hidden"><div id="followContent" class="loading">جاري تحميل الطلبات…</div></section>
+</main>
+</div>
+<script>
+(function(){
+ const cfg=window.TATTOOUI_SUPABASE;
+ if(!cfg||!window.supabase){document.getElementById('loginError').textContent='تعذر الاتصال بالخدمة. يرجى تحديث الصفحة.';return;}
+ const db=window.supabase.createClient(cfg.url,cfg.publishableKey);
+ const $=id=>document.getElementById(id);
+ let newOrders=[],followOrders=[],items=[],activeTab='new',busy=false;
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const money=v=>Number(v||0).toLocaleString('fr-FR',{maximumFractionDigits:2})+' DH';
+ function say(msg,type){$('message').innerHTML=msg?'<div class="panel '+(type==='error'?'error':'success')+'">'+esc(msg)+'</div>':'';}
+ function setBusy(v){busy=v;document.querySelectorAll('.actions button').forEach(b=>b.disabled=v);}
+ function setTab(tab){activeTab=tab;$('newView').classList.toggle('hidden',tab!=='new');$('followView').classList.toggle('hidden',tab!=='follow');$('newTab').classList.toggle('active',tab==='new');$('followTab').classList.toggle('active',tab==='follow');say('');}
+ $('newTab').addEventListener('click',()=>setTab('new'));$('followTab').addEventListener('click',()=>setTab('follow'));
+ function card(o,follow=false){
+  const oi=items.filter(i=>i.order_id===o.id);
+  const phone=String(o.phone||'').replace(/[^+\d]/g,'');
+  const productHtml=oi.map(i=>'<div class="product-row"><span>'+esc(i.product_name)+' × '+esc(i.quantity)+'</span><b>'+money(i.line_total)+'</b></div>').join('');
+  return '<article class="panel"><div class="order-head"><span class="order-no">طلب '+esc(o.order_number||String(o.id).slice(0,8))+'</span><span class="pill">'+(follow?'اتصال لاحقاً':'طلب جديد')+'</span></div>'+
+   '<div class="customer">'+esc(o.customer_name||'زبون بدون اسم')+'</div>'+
+   '<div class="info"><div><small>الهاتف</small><strong dir="ltr">'+esc(o.phone||'—')+'</strong></div><div><small>المدينة</small><strong>'+esc(o.city||'—')+'</strong></div><div class="address"><small>العنوان</small><strong>'+esc(o.address||'—')+'</strong></div>'+
+   (o.notes?'<div class="address"><small>ملاحظات</small><strong>'+esc(o.notes)+'</strong></div>':'')+'</div>'+
+   '<a class="call" href="tel:'+esc(phone)+'">☎ الاتصال بالزبون</a>'+
+   '<div class="products">'+(productHtml||'<div class="muted">تفاصيل المنتجات غير متوفرة</div>')+'</div>'+
+   '<div class="total"><span>المجموع</span><span>'+money(o.total)+'</span></div>'+
+   '<div class="actions"><button class="confirm" data-action="confirmed" data-id="'+esc(o.id)+'">تأكيد الطلب</button><button class="cancel" data-action="cancelled" data-id="'+esc(o.id)+'">إلغاء الطلب</button><button class="later" data-action="later" data-id="'+esc(o.id)+'">الاتصال لاحقاً</button></div></article>';
+ }
+ function render(){
+  $('newCount').textContent=newOrders.length;$('followCount').textContent=followOrders.length;
+  $('newContent').innerHTML=newOrders.length?newOrders.map(o=>card(o,false)).join(''):'<div class="panel empty"><b>لا توجد طلبات جديدة</b>ستظهر هنا الطلبات التي تحتاج إلى التأكيد.</div>';
+  $('followContent').innerHTML=followOrders.length?followOrders.map(o=>card(o,true)).join(''):'<div class="panel empty"><b>لا توجد اتصالات مؤجلة</b>الطلبات التي تختارين لها الاتصال لاحقاً ستظهر هنا.</div>';
+ }
+ async function load(){
+  say('');
+  const fr=await db.from('staff_order_followups').select('order_id,updated_at').order('updated_at',{ascending:true});
+  if(fr.error){say('تعذر تحميل قائمة الاتصال لاحقاً: '+fr.error.message,'error');return;}
+  const fids=(fr.data||[]).map(x=>x.order_id);
+  let q=db.from('orders').select('id,order_number,customer_name,phone,city,address,notes,total,status,created_at').eq('status','new').order('created_at',{ascending:true});
+  const nr=await q;
+  if(nr.error){say('تعذر تحميل الطلبات: '+nr.error.message,'error');return;}
+  const all=nr.data||[];
+  newOrders=all.filter(o=>!fids.includes(o.id));
+  followOrders=fids.length?all.filter(o=>fids.includes(o.id)):[]; 
+  const ids=[...new Set(all.map(o=>o.id))];
+  if(ids.length){const ir=await db.from('order_items').select('order_id,product_name,quantity,line_total').in('order_id',ids);if(ir.error){say('تعذر تحميل تفاصيل المنتجات: '+ir.error.message,'error');return;}items=ir.data||[];}else items=[];
+  render();
+ }
+ async function handleAction(action,id){
+  if(busy)return;
+  const label=action==='confirmed'?'تأكيد هذا الطلب؟':action==='cancelled'?'هل تريدين إلغاء هذا الطلب؟':'إضافة هذا الطلب إلى قائمة الاتصال لاحقاً؟';
+  if(!window.confirm(label))return;
+  setBusy(true);say('');
+  const rpc=action==='later'?'staff_mark_call_later':'staff_mark_order_status';
+  const args=action==='later'?{p_order_id:id}:{p_order_id:id,p_status:action};
+  const r=await db.rpc(rpc,args);
+  setBusy(false);
+  if(r.error){say('لم يتم حفظ التغيير: '+r.error.message,'error');return;}
+  say(action==='confirmed'?'تم تأكيد الطلب بنجاح.':action==='cancelled'?'تم إلغاء الطلب.':'تمت إضافة الطلب إلى قائمة الاتصال لاحقاً.','success');
+  await load();
+ }
+ document.addEventListener('click',e=>{const b=e.target.closest('button[data-action]');if(b)handleAction(b.dataset.action,b.dataset.id);});
+ async function enter(session){
+  if(!session){$('loginPanel').classList.remove('hidden');$('app').classList.add('hidden');$('logoutBtn').classList.add('hidden');return;}
+  const pr=await db.from('profiles').select('id,full_name,role').eq('id',session.user.id).maybeSingle();
+  if(pr.error||!pr.data||pr.data.role!=='order_confirmer'){
+   await db.auth.signOut();$('loginError').textContent='هذا الحساب غير مفعّل لتأكيد الطلبات. تواصلي مع المسؤول.';return;
+  }
+  $('loginPanel').classList.add('hidden');$('app').classList.remove('hidden');$('logoutBtn').classList.remove('hidden');$('staffName').textContent=pr.data.full_name||'موظفة تأكيد الطلبات';
+  await load();
+ }
+ $('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginBtn').disabled=true;$('loginError').textContent='';const r=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});$('loginBtn').disabled=false;if(r.error){$('loginError').textContent='البريد الإلكتروني أو كلمة المرور غير صحيحة.';return;}await enter(r.data.session);});
+ $('logoutBtn').addEventListener('click',async()=>{await db.auth.signOut();location.reload();});
+ $('refreshBtn').addEventListener('click',load);
+ db.auth.getSession().then(({data})=>enter(data.session));
+ db.auth.onAuthStateChange((_event,session)=>{if(!session){$('app').classList.add('hidden');$('loginPanel').classList.remove('hidden');$('logoutBtn').classList.add('hidden');}});
+ if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
