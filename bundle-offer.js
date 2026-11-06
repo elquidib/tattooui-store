@@ -11,7 +11,7 @@
       Number(p.stock) >= 2 && offerPrice() > 0 && offerPrice() < Number(p.price) * 2);
   }
   function refreshConfig() {
-    return supabaseRest("storefront_bundle_offer?select=bundle_offer_enabled,bundle_offer_price,bundle_offer_product_ids&limit=1")
+    return supabaseRest("site_settings?select=bundle_offer_enabled,bundle_offer_price,bundle_offer_product_ids&id=eq.true&limit=1")
       .then(rows => {
         if (Array.isArray(rows) && rows[0]) siteSettings = { ...siteSettings, ...rows[0] };
         if (typeof render === "function") render();
