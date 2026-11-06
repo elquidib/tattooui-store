@@ -91,7 +91,7 @@
       subtotal += line;
       const desc = bundled ? (currentLanguage === "ar" ? "قطعتان من نفس التصميم + هدية مفاجأة" : currentLanguage === "fr" ? "2 fois le même design + cadeau surprise" : "2 of the same design + surprise gift") : money(p.price) + " each";
       const controls = bundled
-        ? '<div class="mini-qty"><span class="mini-qty-count">2 + 1 🎁</span><button type="button" class="remove" onclick="event.stopPropagation();removeFromCart(' + p.id + ')">×</button></div>'
+        ? '<div class="mini-qty"><span class="mini-qty-count">' + (currentLanguage === "ar" ? "2 + 1 هدية" : "2 + 1 🎁") + '</span><button type="button" class="remove" onclick="event.stopPropagation();removeFromCart(' + p.id + ')">×</button></div>'
         : '<div class="mini-qty"><button type="button" class="mini-qty-btn" onclick="event.stopPropagation();updateCartQty(' + p.id + ',-1)">−</button><span class="mini-qty-count">' + row.qty + ' pcs</span><button type="button" class="mini-qty-btn" onclick="event.stopPropagation();updateCartQty(' + p.id + ',1)">+</button><button type="button" class="remove" onclick="event.stopPropagation();removeFromCart(' + p.id + ')">×</button></div>';
       return '<div class="cart-item"><img src="' + fastProductImage(p.images[0]?.src) + '" alt="' + esc(p.name) + '"><div><h4>' + esc(p.name) + '</h4><p>' + desc + '</p>' + controls + '</div><b>' + money(line) + '</b></div>';
     }).join("");
@@ -104,7 +104,7 @@
   function checkoutItem(row, p) {
     const bundled = !!row.bundleOffer;
     const meta = bundled ? (currentLanguage === "ar" ? "2 من نفس التصميم + هدية مفاجأة" : currentLanguage === "fr" ? "2 fois le même design + 1 cadeau surprise" : "2 of the same design + 1 surprise gift") : money(p.price) + " each";
-    const qty = bundled ? '<div class="checkout-item-meta" style="color:#16834b;font-weight:700">3 tattoos · 1 free gift</div>' :
+    const qty = bundled ? '<div class="checkout-item-meta" style="color:#16834b;font-weight:700">' + (currentLanguage === "ar" ? "3 أوشام · هدية مجانية" : currentLanguage === "fr" ? "3 tatouages · 1 cadeau gratuit" : "3 tattoos · 1 free gift") + '</div>' :
       '<div class="checkout-qty"><button type="button" onclick="changeCheckoutQty(' + p.id + ',-1)">−</button><span class="checkout-qty-value" id="checkout-qty-' + p.id + '">' + row.qty + ' pcs</span><button type="button" onclick="changeCheckoutQty(' + p.id + ',1)">+</button></div>';
     const line = bundled ? Number(row.bundlePrice || offerPrice()) : Number(p.price) * Number(row.qty);
     return '<div class="checkout-item" id="checkout-item-' + p.id + '"><img class="checkout-item-image" src="' + fastProductImage(p.images[0]?.src) + '" alt="' + esc(p.name) + '" loading="lazy" decoding="async"><div class="checkout-item-info"><div class="checkout-item-name">' + esc(p.name) + '</div><div class="checkout-item-meta">' + meta + '</div>' + qty + '</div><div class="checkout-item-price"><b id="checkout-line-' + p.id + '">' + money(line) + '</b><button type="button" class="checkout-remove" onclick="removeFromCheckout(' + p.id + ')">×</button></div></div>';
@@ -151,7 +151,7 @@
           const p = products.find(x => x.id === row.id);
           if (!p) continue;
           const line = (info.items || []).find(item => item.name === p.name);
-          if (line) { line.name = p.name + " × 2"; line.qty = 2; line.total = Number(row.bundlePrice || offerPrice()); }
+          if (line) { line.name = p.name; line.qty = 2; line.total = Number(row.bundlePrice || offerPrice()); }
           info.items = info.items || [];
           info.items.push({ name: "هدية مجانية (مفاجأة)", qty: 1, total: 0 });
           info.discount_amount = Number(info.discount_amount || 0) + Math.max(0, Number(p.price) * 2 - Number(row.bundlePrice || offerPrice()));
