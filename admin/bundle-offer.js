@@ -75,6 +75,13 @@
     await loadBundleOfferSettings();
   };
 
+  const originalRenderAnalytics = renderAnalytics;
+  renderAnalytics = function() {
+    const allItems = orderItems;
+    orderItems = allItems.filter(item => !item.is_gift);
+    try { originalRenderAnalytics(); } finally { orderItems = allItems; }
+  };
+
   const originalRenderOrderDetail = renderOrderDetail;
   renderOrderDetail = function(id) {
     originalRenderOrderDetail(id);
