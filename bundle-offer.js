@@ -118,7 +118,7 @@
     const end = html.indexOf('</div><div class="order-line"><span>Subtotal</span>', start);
     if (start >= 0 && end > start) {
       const items = cart.map(row => { const p = products.find(x => x.id === row.id); return p ? checkoutItem(row, p) : ""; }).join("");
-      html = html.slice(0, start) + '<div class="checkout-items">' + items + html.slice(end + 6);
+      html = html.slice(0, start) + '<div class="checkout-items">' + items + '</div>' + html.slice(end + 6);
     }
     return html;
   };
