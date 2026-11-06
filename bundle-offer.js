@@ -28,12 +28,14 @@
     const gift = ar ? "هدية مفاجأة" : fr ? "CADEAU SURPRISE" : "SURPRISE GIFT";
     const savings = money(Number(p.price) * 2 - offerPrice());
     const saveLabel = ar ? "وفّر " + savings : fr ? "ÉCONOMISEZ " + savings : "SAVE " + savings;
+    const delta = offerPrice() - Number(p.price);
+    const upgrade = ar ? (delta > 0 ? "بزيادة " + money(delta) + " فقط تحصل على وشمين إضافيين" : delta === 0 ? "بنفس ثمن وشم واحد تحصل على 3 أوشام" : "وفّر " + money(-delta) + " مقارنة بوشم واحد واحصل على 3 أوشام") : fr ? (delta > 0 ? "Pour " + money(delta) + " de plus, obtenez 2 tatouages supplémentaires" : "3 tatouages pour le prix d’un") : (delta > 0 ? "Just " + money(delta) + " more for 2 extra tattoos" : "Get 3 tattoos for less than one regular tattoo");
     const cta = ar ? "اطلب العرض" : fr ? "Profiter de l’offre" : "GET THIS OFFER";
     const notice = ar ? "الدفع عند الاستلام · التوصيل لجميع أنحاء المغرب" : fr ? "Paiement à la livraison · Livraison partout au Maroc" : "Cash on delivery · Delivery across Morocco";
     return '<div class="purchase-area"><div class="bundle-offers">' +
       '<button type="button" class="bundle-choice" onclick="buyNow(' + p.id + ')"><span class="bundle-choice-copy"><b>' + single + '</b><small>' + singleDesc + '</small></span><strong>' + money(p.price) + '</strong></button>' +
       '<div class="bundle-choice bundle-choice-featured"><span class="bundle-badges"><em>' + best + '</em><em>' + saveLabel + '</em><em>' + gift + '</em></span><div class="bundle-choice-row"><span class="bundle-choice-copy"><b>' + bundle + '</b><small>' + bundleDesc + '</small></span><span class="bundle-price-wrap"><small class="bundle-old-price">' + money(Number(p.price) * 2) + '</small><strong>' + money(offerPrice()) + '</strong></span></div>' +
-      '<div class="bundle-unit-price">' + (ar ? "أي " : fr ? "Soit " : "Only ") + money(offerPrice() / 3) + (ar ? " للوشم الواحد" : fr ? " par tatouage" : " per tattoo") + '</div><button type="button" class="btn wide bundle-cta" onclick="buyBundleNow(' + p.id + ')">' + cta + '</button></div></div><div class="notice">' + notice + '</div></div>';
+      '<div class="bundle-unit-price">' + (ar ? "أي " : fr ? "Soit " : "Only ") + money(offerPrice() / 3) + (ar ? " للوشم الواحد" : fr ? " par tatouage" : " per tattoo") + '</div><div class="bundle-unit-price">' + upgrade + '</div><button type="button" class="btn wide bundle-cta" onclick="buyBundleNow(' + p.id + ')">' + cta + '</button></div></div><div class="notice">' + notice + '</div></div>';
   }
 
   const originalProductView = productView;
