@@ -93,7 +93,7 @@
     box.innerHTML = cart.map(row => {
       const p = products.find(x => x.id === row.id); if (!p) return "";
       if (row.bundleOffer && !eligible(p)) { row.bundleOffer = false; delete row.bundlePrice; row.qty = 2; }
-      const bundled = !!row.bundleOffer, line = bundled ? Number(row.bundlePrice || offerPrice()) : Number(p.price) * Number(row.qty);
+      const bundled = !!row.bundleOffer, line = bundled ? offerPrice() : Number(p.price) * Number(row.qty);
       subtotal += line;
       const desc = bundled ? (currentLanguage === "ar" ? "قطعتان من نفس التصميم + هدية مفاجأة" : currentLanguage === "fr" ? "2 fois le même design + cadeau surprise" : "2 of the same design + surprise gift") : money(p.price) + " each";
       const controls = bundled
@@ -112,7 +112,7 @@
     const meta = bundled ? (currentLanguage === "ar" ? "2 من نفس التصميم + هدية مفاجأة" : currentLanguage === "fr" ? "2 fois le même design + 1 cadeau surprise" : "2 of the same design + 1 surprise gift") : money(p.price) + " each";
     const qty = bundled ? '<div class="checkout-item-meta" style="color:#16834b;font-weight:700">' + (currentLanguage === "ar" ? "3 أوشام · هدية مجانية" : currentLanguage === "fr" ? "3 tatouages · 1 cadeau gratuit" : "3 tattoos · 1 free gift") + '</div>' :
       '<div class="checkout-qty"><button type="button" onclick="changeCheckoutQty(' + p.id + ',-1)">−</button><span class="checkout-qty-value" id="checkout-qty-' + p.id + '">' + row.qty + ' pcs</span><button type="button" onclick="changeCheckoutQty(' + p.id + ',1)">+</button></div>';
-    const line = bundled ? Number(row.bundlePrice || offerPrice()) : Number(p.price) * Number(row.qty);
+    const line = bundled ? offerPrice() : Number(p.price) * Number(row.qty);
     return '<div class="checkout-item" id="checkout-item-' + p.id + '"><img class="checkout-item-image" src="' + fastProductImage(p.images[0]?.src) + '" alt="' + esc(p.name) + '" loading="lazy" decoding="async"><div class="checkout-item-info"><div class="checkout-item-name">' + esc(p.name) + '</div><div class="checkout-item-meta">' + meta + '</div>' + qty + '</div><div class="checkout-item-price"><b id="checkout-line-' + p.id + '">' + money(line) + '</b><button type="button" class="checkout-remove" onclick="removeFromCheckout(' + p.id + ')">×</button></div></div>';
   }
   const oldCheckoutView = checkoutView;
@@ -157,10 +157,10 @@
           const p = products.find(x => x.id === row.id);
           if (!p) continue;
           const line = (info.items || []).find(item => item.name === p.name);
-          if (line) { line.name = p.name; line.qty = 2; line.total = Number(row.bundlePrice || offerPrice()); }
+          if (line) { line.name = p.name; line.qty = 2; line.total = offerPrice(); }
           info.items = info.items || [];
           info.items.push({ name: "هدية مجانية (مفاجأة)", qty: 1, total: 0 });
-          info.discount_amount = Number(info.discount_amount || 0) + Math.max(0, Number(p.price) * 2 - Number(row.bundlePrice || offerPrice()));
+          info.discount_amount = Number(info.discount_amount || 0) + Math.max(0, Number(p.price) * 2 - offerPrice());
         }
         value = JSON.stringify(info);
       } catch (err) { console.warn("Could not update bundle confirmation details", err); }
