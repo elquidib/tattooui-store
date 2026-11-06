@@ -141,6 +141,41 @@
     return nativeFetch(input, init);
   };
 
+  const nativeStorageSet = Storage.prototype.setItem;
+  Storage.prototype.setItem = function(key, value) {
+    if (key === "tattooui-last-order") {
+      try {
+        const info = JSON.parse(value);
+        const bundleRows = cart.filter(row => row.bundleOffer);
+        for (const row of bundleRows) {
+          const p = products.find(x => x.id === row.id);
+          if (!p) continue;
+          const line = (info.items || []).find(item => item.name === p.name);
+          if (line) { line.name = p.name + " × 2"; line.qty = 2; line.total = Number(row.bundlePrice || offerPrice()); }
+          info.items = info.items || [];
+          info.items.push({ name: "هدية مجانية (مفاجأة)", qty: 1, total: 0 });
+          info.discount_amount = Number(info.discount_amount || 0) + Math.max(0, Number(p.price) * 2 - Number(row.bundlePrice || offerPrice()));
+        }
+        value = JSON.stringify(info);
+      } catch (err) { console.warn("Could not update bundle confirmation details", err); }
+    }
+    return nativeStorageSet.call(this, key, value);
+  };
+
+  const originalConfirmationView = confirmationView;
+  confirmationView = function(orderNumber) {
+    let html = originalConfirmationView(orderNumber);
+    try {
+      const info = JSON.parse(localStorage.getItem("tattooui-last-order") || "{}");
+      if (Number(info.discount_amount) > 0) {
+        const subtotalLine = '<div class="order-line"><span>Subtotal</span><span>' + money(info.subtotal) + '</span></div>';
+        const discountLine = '<div class="order-line" style="color:#16834b"><span>خصم العرض</span><span>− ' + money(info.discount_amount) + '</span></div>';
+        html = html.replace(subtotalLine, subtotalLine + discountLine);
+      }
+    } catch (err) { console.warn("Could not render bundle discount in confirmation", err); }
+    return html;
+  };
+
   document.addEventListener("DOMContentLoaded", refreshConfig, { once: true });
   if (document.readyState !== "loading") refreshConfig();
 })();
