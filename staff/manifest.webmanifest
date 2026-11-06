@@ -1,0 +1,14 @@
+{
+  "name": "Tattooui Staff - تأكيد الطلبات",
+  "short_name": "Tattooui Staff",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/staff/",
+  "scope": "/staff/",
+  "display": "standalone",
+  "background_color": "#f7f6f2",
+  "theme_color": "#111111",
+  "icons": [
+    { "src": "../favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
