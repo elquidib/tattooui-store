@@ -19,25 +19,62 @@
       .catch(err => console.warn("Could not load bundle offer settings", err));
   }
   function offerMarkup(p) {
-    const ar = currentLanguage === "ar", fr = currentLanguage === "fr";
-    const single = ar ? "شراء وشم واحد" : fr ? "Acheter 1 tatouage" : "BUY 1 TATTOO";
-    const singleDesc = ar ? "وشم واحد من اختيارك" : fr ? "1 tatouage de votre choix" : "1 tattoo of your choice";
-    const bundle = ar ? "اشتري 2 واحصل على 1 مجاناً" : fr ? "Achetez 2, recevez-en 1 gratuit" : "BUY 2, GET 1 FREE";
-    const bundleDesc = ar ? "2 من نفس التصميم + وشم هدية مفاجأة" : fr ? "2 fois le même design + 1 cadeau surprise" : "2 of the same design + 1 surprise gift";
-    const best = ar ? "أفضل عرض" : fr ? "MEILLEURE OFFRE" : "BEST VALUE";
-    const gift = ar ? "هدية مفاجأة" : fr ? "CADEAU SURPRISE" : "SURPRISE GIFT";
-    const savings = money(Number(p.price) * 2 - offerPrice());
-    const saveLabel = ar ? "وفّر " + savings : fr ? "ÉCONOMISEZ " + savings : "SAVE " + savings;
-    const delta = offerPrice() - Number(p.price);
-    const upgrade = ar ? (delta > 0 ? "بزيادة " + money(delta) + " فقط تحصل على وشمين إضافيين" : delta === 0 ? "بنفس ثمن وشم واحد تحصل على 3 أوشام" : "وفّر " + money(-delta) + " مقارنة بوشم واحد واحصل على 3 أوشام") : fr ? (delta > 0 ? "Pour " + money(delta) + " de plus, obtenez 2 tatouages supplémentaires" : "3 tatouages pour le prix d’un") : (delta > 0 ? "Just " + money(delta) + " more for 2 extra tattoos" : "Get 3 tattoos for less than one regular tattoo");
-    const cta = ar ? "اطلب العرض" : fr ? "Profiter de l’offre" : "GET THIS OFFER";
-    const notice = ar ? "الدفع عند الاستلام · التوصيل لجميع أنحاء المغرب" : fr ? "Paiement à la livraison · Livraison partout au Maroc" : "Cash on delivery · Delivery across Morocco";
-    return '<div class="purchase-area"><div class="bundle-offers">' +
-      '<button type="button" class="bundle-choice" onclick="buyNow(' + p.id + ')"><span class="bundle-choice-copy"><b>' + single + '</b><small>' + singleDesc + '</small></span><strong>' + money(p.price) + '</strong></button>' +
-      '<div class="bundle-choice bundle-choice-featured"><span class="bundle-badges"><em>' + best + '</em><em>' + saveLabel + '</em><em>' + gift + '</em></span><div class="bundle-choice-row"><span class="bundle-choice-copy"><b>' + bundle + '</b><small>' + bundleDesc + '</small></span><span class="bundle-price-wrap"><small class="bundle-old-price">' + money(Number(p.price) * 2) + '</small><strong>' + money(offerPrice()) + '</strong></span></div>' +
-      '<div class="bundle-unit-price">' + (ar ? "أي " : fr ? "Soit " : "Only ") + money(offerPrice() / 3) + (ar ? " للوشم الواحد" : fr ? " par tatouage" : " per tattoo") + '</div><div class="bundle-unit-price">' + upgrade + '</div><button type="button" class="btn wide bundle-cta" onclick="buyBundleNow(' + p.id + ')">' + cta + '</button></div></div><div class="notice">' + notice + '</div></div>';
+    const regularPrice = Number(p.price);
+    const bundlePrice = offerPrice();
+    const saving = Math.max(0, regularPrice * 2 - bundlePrice);
+    const extra = bundlePrice - regularPrice;
+    const singleDesc = "وشم واحد من اختيارك";
+    const bundleDesc = "وشمان من نفس التصميم + وشم هدية مفاجأة";
+    const upgrade = extra > 0
+      ? "بزيادة " + money(extra) + " فقط تحصل على وشمين إضافيين وهدية"
+      : extra === 0
+        ? "بنفس ثمن وشم واحد تحصل على 3 أوشام"
+        : "وفّر " + money(-extra) + " واحصل على 3 أوشام";
+    return '<div class="purchase-area" dir="rtl"><div class="bundle-offers">' +
+      '<div class="bundle-choice bundle-single is-selected" data-offer-card="single" onclick="selectTattoouiOffer(' + p.id + ',\\'single\\')">' +
+      '<div class="bundle-choice-row"><span class="bundle-choice-copy"><b><span class="bundle-radio" data-offer-radio="single">●</span> شراء وشم واحد</b><small>' + singleDesc + '</small></span><strong>' + money(regularPrice) + '</strong></div>' +
+      '<button type="button" class="btn wide bundle-confirm bundle-single-cta" onclick="confirmTattoouiOffer(' + p.id + ',\\'single\\',event)">تأكيد الطلب</button></div>' +
+      '<div class="bundle-choice bundle-choice-featured" data-offer-card="bundle" onclick="selectTattoouiOffer(' + p.id + ',\\'bundle\\')">' +
+      '<span class="bundle-badges"><em>الأكثر طلباً</em><em>وفّر ' + money(saving) + '</em><em>هدية مجانية</em></span>' +
+      '<div class="bundle-choice-row"><span class="bundle-choice-copy"><b><span class="bundle-radio" data-offer-radio="bundle">○</span> اشتري 2 واحصل على 1 مجاناً</b><small>' + bundleDesc + '</small></span><span class="bundle-price-wrap"><small class="bundle-old-price">' + money(regularPrice * 2) + '</small><strong>' + money(bundlePrice) + '</strong></span></div>' +
+      '<div class="bundle-unit-price">فقط ' + money(bundlePrice / 3) + ' للوشم الواحد</div><div class="bundle-unit-price">' + upgrade + '</div>' +
+      '<button type="button" class="btn wide bundle-cta" onclick="confirmTattoouiOffer(' + p.id + ',\\'bundle\\',event)">تأكيد الطلب</button></div></div>' +
+      '<div class="notice">الدفع عند الاستلام · التوصيل لجميع أنحاء المغرب</div></div>';
   }
 
+  window.selectTattoouiOffer = function(id, type) {
+    window.tattoouiSelectedOffer = window.tattoouiSelectedOffer || {};
+    window.tattoouiSelectedOffer[id] = type;
+    document.querySelectorAll("[data-offer-card]").forEach(card => {
+      const selected = card.dataset.offerCard === type;
+      card.classList.toggle("is-selected", selected);
+      const radio = card.querySelector("[data-offer-radio]");
+      if (radio) radio.textContent = selected ? "●" : "○";
+    });
+  };
+
+  window.confirmTattoouiOffer = function(id, type, event) {
+    if (event) event.stopPropagation();
+    const selected = (window.tattoouiSelectedOffer || {})[id] || "single";
+    if (selected !== type) {
+      selectTattoouiOffer(id, type);
+      return;
+    }
+    if (type === "bundle") return buyBundleNow(id);
+    const row = cart.find(x => x.id === id);
+    if (row) {
+      row.qty = 1;
+      row.bundleOffer = false;
+      delete row.bundlePrice;
+    } else {
+      cart.push({ id, qty: 1 });
+    }
+    localStorage.setItem("tattooui-cart", JSON.stringify(cart));
+    updateBadge(); closeCart(); closeMobileMenu();
+    history.replaceState(null, "", "#/checkout"); resetTurnstile();
+    render(); window.scrollTo(0, 0); setTimeout(renderTurnstile, 120);
+    return true;
+  };
   const originalProductView = productView;
   productView = function(p) {
     let html = originalProductView(p);
