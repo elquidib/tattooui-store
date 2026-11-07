@@ -31,14 +31,14 @@
         ? "بنفس ثمن وشم واحد تحصل على 3 أوشام"
         : "وفّر " + money(-extra) + " واحصل على 3 أوشام";
     return '<div class="purchase-area" dir="rtl"><div class="bundle-offers">' +
-      '<div class="bundle-choice bundle-single is-selected" data-offer-card="single" onclick="selectTattoouiOffer(' + p.id + ',\\'single\\')">' +
+      '<div class="bundle-choice bundle-single is-selected" data-offer-card="single" onclick="selectTattoouiOffer(' + p.id + ',\'single\')">' +
       '<div class="bundle-choice-row"><span class="bundle-choice-copy"><b><span class="bundle-radio" data-offer-radio="single">●</span> شراء وشم واحد</b><small>' + singleDesc + '</small></span><strong>' + money(regularPrice) + '</strong></div>' +
-      '<button type="button" class="btn wide bundle-confirm bundle-single-cta" onclick="confirmTattoouiOffer(' + p.id + ',\\'single\\',event)">تأكيد الطلب</button></div>' +
-      '<div class="bundle-choice bundle-choice-featured" data-offer-card="bundle" onclick="selectTattoouiOffer(' + p.id + ',\\'bundle\\')">' +
+      '<button type="button" class="btn wide bundle-confirm bundle-single-cta" onclick="confirmTattoouiOffer(' + p.id + ',\'single\',event)">تأكيد الطلب</button></div>' +
+      '<div class="bundle-choice bundle-choice-featured" data-offer-card="bundle" onclick="selectTattoouiOffer(' + p.id + ',\'bundle\')">' +
       '<span class="bundle-badges"><em>الأكثر طلباً</em><em>وفّر ' + money(saving) + '</em><em>هدية مجانية</em></span>' +
       '<div class="bundle-choice-row"><span class="bundle-choice-copy"><b><span class="bundle-radio" data-offer-radio="bundle">○</span> اشتري 2 واحصل على 1 مجاناً</b><small>' + bundleDesc + '</small></span><span class="bundle-price-wrap"><small class="bundle-old-price">' + money(regularPrice * 2) + '</small><strong>' + money(bundlePrice) + '</strong></span></div>' +
       '<div class="bundle-unit-price">فقط ' + money(bundlePrice / 3) + ' للوشم الواحد</div><div class="bundle-unit-price">' + upgrade + '</div>' +
-      '<button type="button" class="btn wide bundle-cta" onclick="confirmTattoouiOffer(' + p.id + ',\\'bundle\\',event)">تأكيد الطلب</button></div></div>' +
+      '<button type="button" class="btn wide bundle-cta" onclick="confirmTattoouiOffer(' + p.id + ',\'bundle\',event)">تأكيد الطلب</button></div></div>' +
       '<div class="notice">الدفع عند الاستلام · التوصيل لجميع أنحاء المغرب</div></div>';
   }
 
