@@ -89,15 +89,22 @@ input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;ba
  function card(o,follow=false){
   const oi=items.filter(i=>i.order_id===o.id);
   const phone=String(o.phone||'').replace(/[^+\d]/g,'');
+  const isConfirmed=o.status==='confirmed';
   const productHtml=oi.map(i=>'<div class="product-row"><span>'+esc(i.product_name)+' × '+esc(i.quantity)+'</span><b>'+money(i.line_total)+'</b></div>').join('');
-  return '<article class="panel"><div class="order-head"><span class="order-no">طلب '+esc(o.order_number||String(o.id).slice(0,8))+'</span><span class="pill">'+(follow?'اتصال لاحقاً':'طلب جديد')+'</span></div>'+
+  const statusLabel=isConfirmed?'تم التأكيد':(follow?'اتصال لاحقاً':'طلب جديد');
+  const waType=isConfirmed?'confirmed':'new';
+  const waLabel=isConfirmed?'● WhatsApp – معلومات التوصيل':'● WhatsApp – رسالة تأكيد الطلب';
+  const actionButtons=isConfirmed
+   ?'<button class="confirm" type="button" disabled>✓ تم تأكيد الطلب</button><button class="cancel" data-action="cancelled" data-id="'+esc(o.id)+'">إلغاء الطلب</button>'
+   :'<button class="confirm" data-action="confirmed" data-id="'+esc(o.id)+'">تأكيد الطلب</button><button class="cancel" data-action="cancelled" data-id="'+esc(o.id)+'">إلغاء الطلب</button><button class="later" data-action="later" data-id="'+esc(o.id)+'">الاتصال لاحقاً</button>';
+  return '<article class="panel"><div class="order-head"><span class="order-no">طلب '+esc(o.order_number||String(o.id).slice(0,8))+'</span><span class="pill">'+statusLabel+'</span></div>'+
    '<div class="customer">'+esc(o.customer_name||'زبون بدون اسم')+'</div>'+
    '<div class="info"><div><small>الهاتف</small><strong dir="ltr">'+esc(o.phone||'—')+'</strong></div><div><small>المدينة</small><strong>'+esc(o.city||'—')+'</strong></div><div class="address"><small>العنوان</small><strong>'+esc(o.address||'—')+'</strong></div>'+
    (o.notes?'<div class="address"><small>ملاحظات</small><strong>'+esc(o.notes)+'</strong></div>':'')+'</div>'+
-   '<a class="whatsapp" target="_blank" rel="noopener" href="'+esc(whatsappUrl(o,'new'))+'">● WhatsApp – رسالة تأكيد الطلب</a>'+'<a class="call" href="tel:'+esc(phone)+'">☎ الاتصال بالزبون</a>'+
+   '<a class="whatsapp" target="_blank" rel="noopener" href="'+esc(whatsappUrl(o,waType))+'">'+waLabel+'</a>'+'<a class="call" href="tel:'+esc(phone)+'">☎ الاتصال بالزبون</a>'+
    '<div class="products">'+(productHtml||'<div class="muted">تفاصيل المنتجات غير متوفرة</div>')+'</div>'+
    '<div class="total"><span>المجموع</span><span>'+money(o.total)+'</span></div>'+
-   '<div class="actions"><button class="confirm" data-action="confirmed" data-id="'+esc(o.id)+'">تأكيد الطلب</button><button class="cancel" data-action="cancelled" data-id="'+esc(o.id)+'">إلغاء الطلب</button><button class="later" data-action="later" data-id="'+esc(o.id)+'">الاتصال لاحقاً</button></div></article>';
+   '<div class="actions">'+actionButtons+'</div></article>';
  }
  function orderLabel(o){return o.order_number??String(o.id).slice(0,6);}
  function render(){
@@ -122,10 +129,10 @@ input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;ba
   const fr=await db.from('staff_order_followups').select('order_id,updated_at').order('updated_at',{ascending:false});
   if(fr.error){say('تعذر تحميل قائمة الاتصال لاحقاً: '+fr.error.message,'error');return;}
   const fids=(fr.data||[]).map(x=>x.order_id);
-  const nr=await db.from('orders').select('id,order_number,customer_name,phone,city,address,notes,total,status,created_at').eq('status','new').order('created_at',{ascending:false});
+  const nr=await db.from('orders').select('id,order_number,customer_name,phone,city,address,notes,total,status,created_at').in('status',['new','confirmed']).order('created_at',{ascending:false});
   if(nr.error){say('تعذر تحميل الطلبات: '+nr.error.message,'error');return;}
   const all=nr.data||[];
-  newOrders=all.filter(o=>!fids.includes(o.id));followOrders=all.filter(o=>fids.includes(o.id));
+  newOrders=all.filter(o=>o.status==='confirmed'||!fids.includes(o.id));followOrders=all.filter(o=>o.status==='new'&&fids.includes(o.id));
   const ids=all.map(o=>o.id);
   if(ids.length){const ir=await db.from('order_items').select('order_id,product_name,quantity,line_total').in('order_id',ids);if(ir.error){say('تعذر تحميل تفاصيل المنتجات: '+ir.error.message,'error');return;}items=ir.data||[];}else items=[];
   render();
@@ -140,8 +147,9 @@ input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;ba
   const r=await db.rpc(rpc,args);
   setBusy(false);
   if(r.error){say('لم يتم حفظ التغيير: '+r.error.message,'error');return;}
-  if(action==='confirmed')lastConfirmedOrder=newOrders.concat(followOrders).find(o=>o.id===id)||null;
-  selectedId=null;pickerOpen=false;
+  if(action==='confirmed'){lastConfirmedOrder=newOrders.concat(followOrders).find(o=>o.id===id)||null;selectedId=id;}
+  else selectedId=null;
+  pickerOpen=false;
   await load();
   if(action==='confirmed')say('تم تأكيد الطلب بنجاح. أرسلي للزبون رسالة التأكيد:', 'confirmed');
   else say(action==='cancelled'?'تم إلغاء الطلب.':'تمت إضافة الطلب إلى قائمة الاتصال لاحقاً.','success');
