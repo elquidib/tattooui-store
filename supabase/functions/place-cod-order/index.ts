@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
 
   const result = Array.isArray(data) ? data[0] : data;
   const metaToken = Deno.env.get("META_CAPI_ACCESS_TOKEN");
-  const metaPixelId = Deno.env.get("META_PIXEL_ID") || "2334047827334740";
+  const metaPixelId = "1779326693144935"; // Must match the browser Pixel initialized in index.html.
   const purchaseEventId = String(body.purchase_event_id || "").trim();
 
   async function sendMetaPurchase() {
@@ -132,9 +132,9 @@ Deno.serve(async (req) => {
       };
 
       const normalizeName = (value: string) =>
-        value.trim().toLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-z0-9\\s]/g, "").replace(/\\s+/g, " ");
+        value.trim().toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ");
 
-      const rawPhone = String(order.p_phone || "").replace(/\\D/g, "");
+      const rawPhone = String(order.p_phone || "").replace(/\D/g, "");
       const phoneDigits = rawPhone.startsWith("212") ? rawPhone : rawPhone.replace(/^0/, "212");
       const normalizedPhone = phoneDigits ? "+" + phoneDigits : "";
       const nameParts = normalizeName(String(order.p_customer_name || "")).split(" ").filter(Boolean);
