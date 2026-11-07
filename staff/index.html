@@ -112,8 +112,8 @@ input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;ba
   $('newContent').innerHTML=picker+(selected?'<div class="notice">اختاري أي رقم من القائمة لفتح الطلب مباشرة. الطلبات مرتبة من الأحدث إلى الأقدم.</div>'+card(selected,isFollow):'<div class="panel empty"><b>لا توجد طلبات معلّقة</b>ستظهر هنا الطلبات الجديدة واتصالات المتابعة.</div>');
   $('followContent').innerHTML=followOrders.length?followOrders.map(o=>'<div class="listrow" data-follow-open="'+esc(o.id)+'"><div><b>طلب '+esc(orderLabel(o))+' · '+esc(o.customer_name||'بدون اسم')+'</b><small>'+esc(o.city||'')+'</small></div><span>فتح ←</span></div>').join(''):'<div class="panel empty"><b>لا توجد اتصالات مؤجلة</b>الطلبات التي تختارين لها الاتصال لاحقاً ستظهر هنا.</div>';
   const toggle=$('pickerToggle');if(toggle)toggle.addEventListener('click',()=>{pickerOpen=!pickerOpen;render();});
-  const previous=$('previousOrder');if(previous)previous.addEventListener('click',()=>{if(selectedIndex>0){selectedId=allPending[selectedIndex-1].id;pickerOpen=false;render();}});
-  const next=$('nextOrder');if(next)next.addEventListener('click',()=>{if(selectedIndex>=0&&selectedIndex<allPending.length-1){selectedId=allPending[selectedIndex+1].id;pickerOpen=false;render();}});
+  const previous=$('previousOrder');if(previous)previous.addEventListener('click',()=>{if(selectedIndex>=0&&selectedIndex<allPending.length-1){selectedId=allPending[selectedIndex+1].id;pickerOpen=false;render();}});
+  const next=$('nextOrder');if(next)next.addEventListener('click',()=>{if(selectedIndex>0){selectedId=allPending[selectedIndex-1].id;pickerOpen=false;render();}});
   document.querySelectorAll('[data-select-order]').forEach(b=>b.addEventListener('click',()=>{selectedId=b.dataset.selectOrder;pickerOpen=false;setTab('new');render();}));
   document.querySelectorAll('[data-follow-open]').forEach(b=>b.addEventListener('click',()=>{selectedId=b.dataset.followOpen;setTab('new');render();}));
  }
