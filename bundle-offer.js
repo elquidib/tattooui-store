@@ -37,7 +37,7 @@
       '<div class="bundle-choice bundle-choice-featured is-selected" data-offer-card="bundle" onclick="selectTattoouiOffer(' + p.id + ',\'bundle\')">' +
       '<span class="bundle-badges"><em>الأكثر طلباً</em><em>وفّر ' + money(saving) + '</em><em>هدية مجانية</em></span>' +
       '<div class="bundle-choice-row"><span class="bundle-choice-copy"><b><span class="bundle-radio" data-offer-radio="bundle">●</span> اشتري 2 واحصل على 1 مجاناً</b><small>' + bundleDesc + '</small></span><span class="bundle-price-wrap"><small class="bundle-old-price">' + money(regularPrice * 2) + '</small><strong>' + money(bundlePrice) + '</strong></span></div>' +
-      '<div class="bundle-unit-price">فقط ' + money(bundlePrice / 3) + ' للوشم الواحد</div><div class="bundle-unit-price">' + upgrade + '</div>' +
+      '<div class="bundle-unit-price">فقط ' + money(Math.floor(bundlePrice / 3)) + ' للوشم الواحد</div><div class="bundle-unit-price">' + upgrade + '</div>' +
       '<button type="button" class="btn wide bundle-cta" onclick="confirmTattoouiOffer(' + p.id + ',\'bundle\',event)">تأكيد الطلب</button></div></div>' +
       '<div class="notice">الدفع عند الاستلام · التوصيل لجميع أنحاء المغرب</div></div>';
   }
