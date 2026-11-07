@@ -77,7 +77,11 @@
     if (!eligible(p)) return html;
     const start = html.indexOf('<div class="purchase-area">');
     const end = html.indexOf('<div class="specs">', start);
-    if (start >= 0 && end > start) html = html.slice(0, start) + offerMarkup(p) + html.slice(end);
+    if (start >= 0 && end > start) {
+      html = html.slice(0, start) + html.slice(end);
+      const description = html.indexOf('<p class="product-copy">');
+      if (description >= 0) html = html.slice(0, description) + offerMarkup(p) + html.slice(description);
+    }
     return html.replace('<div class="mobile-sticky-buy">', '<div class="mobile-sticky-buy" style="display:none">');
   };
 
