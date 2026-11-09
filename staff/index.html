@@ -83,13 +83,13 @@ input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;ba
  function say(msg,type){if(!msg){$('message').innerHTML='';return;}let extra='';if(type==='confirmed'&&lastConfirmedOrder){extra='<a class="message-wa" target="_blank" rel="noopener" href="'+esc(whatsappUrl(lastConfirmedOrder,'confirmed'))+'">● WhatsApp – إرسال رسالة التأكيد</a>';} $('message').innerHTML='<div class="panel '+(type==='error'?'error':'success')+'">'+esc(msg)+extra+'</div>';}
  const WA_MESSAGES={new:'سلام {{name}}،\n\nتوصلنا بالطلب ديالك من TATTO✦OUI!\n\nواش كتأكد لينا الطلب باش نوجدو ليك؟\n\nالمجموع: {{total}} درهم.',confirmed:'سلام {{name}}،\n\nطلبك تأكد بنجاح من TATTO✦OUI.\n\nغادي يوصلك غالباً خلال يوم حتى يومين.\nخليك منتبه للتليفون ديالك، الموزع غادي يتاصل بيك قبل التوصيل.\n\nشكراً على ثقتك فينا 🤍'};
  function normalizeMoroccanPhone(value){let digits=String(value||'').replace(/\D/g,'');if(digits.startsWith('00212'))digits=digits.slice(5);else if(digits.startsWith('212'))digits=digits.slice(3);if(/^[67][0-9]{8}$/.test(digits))digits='0'+digits;return /^0[67][0-9]{8}$/.test(digits)?digits:'';}
- function whatsappUrl(o,type){let phone=String(o.phone||'').replace(/[^0-9]/g,'');if(phone.startsWith('00'))phone=phone.slice(2);if(phone.startsWith('0'))phone='212'+phone.slice(1);else if(!phone.startsWith('212'))phone='212'+phone;const msg=WA_MESSAGES[type].replace(/{{name}}/g,o.customer_name||'').replace(/{{total}}/g,money(o.total));return 'https://wa.me/'+phone+'?text='+encodeURIComponent(msg);}
+ function whatsappUrl(o,type){const localPhone=normalizeMoroccanPhone(o.phone);if(!localPhone)return '#';const phone='212'+localPhone.slice(1);const msg=WA_MESSAGES[type].replace(/{{name}}/g,o.customer_name||'').replace(/{{total}}/g,money(o.total));return 'https://wa.me/'+phone+'?text='+encodeURIComponent(msg);}
  function setBusy(v){busy=v;document.querySelectorAll('.actions button').forEach(b=>b.disabled=v);}
  function setTab(tab){activeTab=tab;$('newView').classList.toggle('hidden',tab!=='new');$('followView').classList.toggle('hidden',tab!=='follow');$('newTab').classList.toggle('active',tab==='new');$('followTab').classList.toggle('active',tab==='follow');say('');}
  $('newTab').addEventListener('click',()=>setTab('new'));$('followTab').addEventListener('click',()=>setTab('follow'));
  function card(o,follow=false){
   const oi=items.filter(i=>i.order_id===o.id);
-  const phone=String(o.phone||'').replace(/[^+\d]/g,'');
+  const phone=normalizeMoroccanPhone(o.phone);
   const isConfirmed=o.status==='confirmed';
   const productHtml=oi.map(i=>'<div class="product-row"><span>'+esc(i.product_name)+' × '+esc(i.quantity)+'</span><b>'+money(i.line_total)+'</b></div>').join('');
   const statusLabel=isConfirmed?'تم التأكيد':(follow?'اتصال لاحقاً':'طلب جديد');
