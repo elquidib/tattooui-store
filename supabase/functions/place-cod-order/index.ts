@@ -22,6 +22,15 @@ const getCorsHeaders = (req: Request) => {
 const json = (req: Request, body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: getCorsHeaders(req) });
 
+function normalizeMoroccanPhone(value: unknown): string {
+  let digits = String(value ?? "").replace(/\\D/g, "");
+  if (digits.startsWith("00212")) digits = digits.slice(5);
+  else if (digits.startsWith("212")) digits = digits.slice(3);
+  if (/^[67][0-9]{8}$/.test(digits)) digits = "0" + digits;
+  return /^0[67][0-9]{8}$/.test(digits) ? digits : "";
+}
+
+
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -86,6 +95,10 @@ Deno.serve(async (req) => {
   if (!order || !Array.isArray(order.p_items)) {
     return json(req, { error: "Invalid order." }, 400);
   }
+
+  const normalizedPhone = normalizeMoroccanPhone(order.p_phone);
+  if (!normalizedPhone) return json(req, { error: "Please enter a valid Moroccan mobile number starting with 06 or 07 (10 digits)." }, 400);
+  order.p_phone = normalizedPhone;
 
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
