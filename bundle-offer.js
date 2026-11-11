@@ -180,7 +180,7 @@
     if (valid.length !== cart.length) { cart = valid; localStorage.setItem("tattooui-cart", JSON.stringify(cart)); updateBadge(); }
     if (!cart.length) {
       box.innerHTML = '<div class="empty">Your bag is empty.<br><br><button class="btn" onclick="closeCart();home()">Explore tattoos</button></div>';
-      document.getElementById("cartSubtotal").textContent = "0 DH";
+      document.getElementById("cartSubtotal").textContent = money(0);
       const se = document.getElementById("cart-shipping"); if (se) se.outerHTML = deliveryMarkup(0, "cart-shipping");
       const dl = document.getElementById("cartDeliveryLabel"); if (dl) dl.textContent = deliveryLabels().delivery;
       return;
