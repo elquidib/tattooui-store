@@ -1,6 +1,6 @@
 (() => {
   const style = document.createElement("style");
-  style.textContent = ".bundle-sticky-wrap{display:none}@media(max-width:700px){.bundle-sticky-wrap{display:block;position:fixed;left:14px;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:89}.bundle-sticky-button{width:100%;min-height:54px;border:0;border-radius:14px;background:#F59E0B;color:#171717;font-size:16px;font-weight:900;box-shadow:0 8px 24px rgba(245,158,11,.32);animation:tattoouiOfferPulse 2.4s ease-in-out infinite}.bundle-sticky-button:active{transform:scale(.98)}@keyframes tattoouiOfferPulse{0%,100%{transform:translateY(0);box-shadow:0 8px 24px rgba(245,158,11,.28)}50%{transform:translateY(-2px);box-shadow:0 11px 30px rgba(245,158,11,.48)}}@media(prefers-reduced-motion:reduce){.bundle-sticky-button{animation:none}}}.bundle-offers{display:grid;gap:12px;margin:20px 0}.bundle-choice{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;text-align:left;padding:17px 16px;border:1px solid var(--line);border-radius:14px;background:#fff;color:#111}.bundle-choice-copy{display:grid;gap:6px;min-width:0}.bundle-choice-copy b{font-size:14px;line-height:1.35}.bundle-choice-copy small{font-size:12px;color:#777;line-height:1.45}.bundle-choice>strong,.bundle-choice-row>strong{font-size:23px;white-space:nowrap}.bundle-choice.is-selected{border:2px solid #222;background:#f7f7f7;box-shadow:0 5px 18px rgba(0,0,0,.07)}.bundle-radio{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1px solid #777;border-radius:50%;font-size:12px;margin-left:7px;vertical-align:middle}.bundle-confirm{margin-top:14px;background:#111;border-color:#111}.bundle-choice-featured{display:block;border:2px solid #16834b;background:#f0faf3;box-shadow:0 8px 24px rgba(24,131,75,.12);animation:bundleOfferGlow 2.8s ease-in-out infinite}.bundle-choice-featured .bundle-cta{background:#16834b;border-color:#16834b;box-shadow:0 5px 16px rgba(22,131,75,.22);animation:bundleCtaPulse 2.4s ease-in-out infinite}.bundle-choice-featured.is-selected{border-color:#0e713d;background:#eaf7ee;box-shadow:0 0 0 2px rgba(22,131,75,.12),0 10px 28px rgba(22,131,75,.16)}.bundle-choice-featured .bundle-radio{border-color:#16834b;color:#16834b}@keyframes bundleOfferGlow{0%,100%{box-shadow:0 8px 24px rgba(24,131,75,.10)}50%{box-shadow:0 11px 30px rgba(24,131,75,.22)}}@keyframes bundleCtaPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}@media(prefers-reduced-motion:reduce){.bundle-choice-featured,.bundle-choice-featured .bundle-cta{animation:none}}.bundle-badges{display:flex;justify-content:space-between;gap:8px;margin-bottom:13px}.bundle-badges em{font-style:normal;font-size:10px;font-weight:800;letter-spacing:.04em;padding:6px 9px;border-radius:999px;background:#e3f3e8;color:#17683d}.bundle-badges em+em{background:#fff1d6;color:#815500}.bundle-choice-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.bundle-unit-price{font-size:12px;font-weight:700;color:#16834b;margin:12px 0}.bundle-price-wrap{text-align:right;white-space:nowrap}.bundle-old-price{display:block;font-size:12px;color:#888;text-decoration:line-through}.bundle-cta{background:#176b3e;border-color:#176b3e}.bundle-cta:hover{background:#105632;border-color:#105632}[dir=rtl] .bundle-choice{text-align:right}[dir=rtl] .bundle-badges{flex-direction:row-reverse}@media(max-width:560px){.bundle-choice{padding:14px}.bundle-choice-copy b{font-size:13px}.bundle-choice>strong,.bundle-choice-row>strong{font-size:21px}}";
+  style.textContent = ".bundle-sticky-wrap{display:none}@media(max-width:700px){.bundle-sticky-wrap{display:block;position:fixed;left:14px;right:14px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:89}.bundle-sticky-button{width:100%;min-height:54px;border:0;border-radius:14px;background:#F59E0B;color:#171717;font-size:16px;font-weight:900;box-shadow:0 8px 24px rgba(245,158,11,.32);animation:tattoouiOfferPulse 2.4s ease-in-out infinite}.bundle-sticky-button:active{transform:scale(.98)}@keyframes tattoouiOfferPulse{0%,100%{transform:translateY(0);box-shadow:0 8px 24px rgba(245,158,11,.28)}50%{transform:translateY(-2px);box-shadow:0 11px 30px rgba(245,158,11,.48)}}@media(prefers-reduced-motion:reduce){.bundle-sticky-button{animation:none}}}.bundle-offers{display:grid;gap:12px;margin:20px 0}.bundle-choice{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;text-align:left;padding:17px 16px;border:1px solid var(--line);border-radius:14px;background:#fff;color:#111}.bundle-choice-copy{display:grid;gap:6px;min-width:0}.bundle-choice-copy b{font-size:14px;line-height:1.35}.bundle-choice-copy small{font-size:12px;color:#777;line-height:1.45}.bundle-choice>strong,.bundle-choice-row>strong{font-size:23px;white-space:nowrap}.bundle-choice.is-selected{border:2px solid #222;background:#f7f7f7;box-shadow:0 5px 18px rgba(0,0,0,.07)}.bundle-radio{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:1px solid #777;border-radius:50%;font-size:12px;margin-left:7px;vertical-align:middle}.bundle-confirm{margin-top:14px;background:#111;border-color:#111}.bundle-choice-featured{display:block;border:2px solid #16834b;background:#f0faf3;box-shadow:0 8px 24px rgba(24,131,75,.12);animation:bundleOfferGlow 2.8s ease-in-out infinite}.bundle-choice-featured .bundle-cta{background:#16834b;border-color:#16834b;box-shadow:0 5px 16px rgba(22,131,75,.22);animation:bundleCtaPulse 2.4s ease-in-out infinite}.bundle-choice-featured.is-selected{border-color:#0e713d;background:#eaf7ee;box-shadow:0 0 0 2px rgba(22,131,75,.12),0 10px 28px rgba(22,131,75,.16)}.bundle-choice-featured .bundle-radio{border-color:#16834b;color:#16834b}@keyframes bundleOfferGlow{0%,100%{box-shadow:0 8px 24px rgba(24,131,75,.10)}50%{box-shadow:0 11px 30px rgba(24,131,75,.22)}}@keyframes bundleCtaPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}@media(prefers-reduced-motion:reduce){.bundle-choice-featured,.bundle-choice-featured .bundle-cta{animation:none}}.bundle-badges{display:flex;justify-content:space-between;gap:8px;margin-bottom:13px}.bundle-badges em{font-style:normal;font-size:10px;font-weight:800;letter-spacing:.04em;padding:6px 9px;border-radius:999px;background:#e3f3e8;color:#17683d}.bundle-badges em+em{background:#fff1d6;color:#815500}.bundle-choice-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.bundle-unit-price{font-size:12px;font-weight:700;color:#16834b;margin:12px 0}.bundle-price-wrap{text-align:right;white-space:nowrap}.bundle-old-price{display:block;font-size:12px;color:#888;text-decoration:line-through}.bundle-action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.bundle-action-row .btn{margin-top:0;min-height:52px;font-size:13px}.bundle-add-cart{background:#fff!important;color:#111!important;border:1px solid #222!important}.bundle-add-cart-featured{border-color:#16834b!important;color:#176b3e!important}.bundle-choice-featured .bundle-cta{margin-top:0}@media(max-width:560px){.bundle-action-row{grid-template-columns:1fr}.bundle-action-row .btn{min-height:48px}}.bundle-cta{background:#176b3e;border-color:#176b3e}.bundle-cta:hover{background:#105632;border-color:#105632}[dir=rtl] .bundle-choice{text-align:right}[dir=rtl] .bundle-badges{flex-direction:row-reverse}@media(max-width:560px){.bundle-choice{padding:14px}.bundle-choice-copy b{font-size:13px}.bundle-choice>strong,.bundle-choice-row>strong{font-size:21px}}";
   document.head.appendChild(style);
 
   function offerPrice() { return Math.max(0, Number(siteSettings.bundle_offer_price || 99)); }
@@ -33,12 +33,12 @@
     return '<div class="purchase-area" dir="rtl"><div class="bundle-offers">' +
       '<div class="bundle-choice bundle-single" data-offer-card="single" onclick="selectTattoouiOffer(' + p.id + ',\'single\')">' +
       '<div class="bundle-choice-row"><span class="bundle-choice-copy"><b><span class="bundle-radio" data-offer-radio="single">○</span> شراء وشم واحد</b><small>' + singleDesc + '</small></span><strong>' + money(regularPrice) + '</strong></div>' +
-      '<button type="button" class="btn wide bundle-confirm bundle-single-cta" onclick="confirmTattoouiOffer(' + p.id + ',\'single\',event)">تأكيد الطلب</button></div>' +
+      '<div class="bundle-action-row"><button type="button" class="btn wide bundle-add-cart" onclick="addTattoouiOfferToCart(' + p.id + ',\'single\',event)">إضافة إلى السلة</button><button type="button" class="btn wide bundle-confirm bundle-single-cta" onclick="confirmTattoouiOffer(' + p.id + ',\'single\',event)">تأكيد الطلب</button></div></div>' +
       '<div class="bundle-choice bundle-choice-featured is-selected" data-offer-card="bundle" onclick="selectTattoouiOffer(' + p.id + ',\'bundle\')">' +
       '<span class="bundle-badges"><em>الأكثر طلباً</em><em>وفّر ' + money(saving) + '</em><em>هدية مجانية</em></span>' +
       '<div class="bundle-choice-row"><span class="bundle-choice-copy"><b><span class="bundle-radio" data-offer-radio="bundle">●</span> اشتري 2 واحصل على 1 مجاناً</b><small>' + bundleDesc + '</small></span><span class="bundle-price-wrap"><small class="bundle-old-price">' + money(regularPrice * 2) + '</small><strong>' + money(bundlePrice) + '</strong></span></div>' +
       '<div class="bundle-unit-price">فقط ' + money(Math.floor(bundlePrice / 3)) + ' للوشم الواحد</div><div class="bundle-unit-price">' + upgrade + '</div>' +
-      '<button type="button" class="btn wide bundle-cta" onclick="confirmTattoouiOffer(' + p.id + ',\'bundle\',event)">تأكيد الطلب</button></div></div>' +
+      '<div class="bundle-action-row"><button type="button" class="btn wide bundle-add-cart bundle-add-cart-featured" onclick="addTattoouiOfferToCart(' + p.id + ',\'bundle\',event)">إضافة إلى السلة</button><button type="button" class="btn wide bundle-cta" onclick="confirmTattoouiOffer(' + p.id + ',\'bundle\',event)">تأكيد الطلب</button></div></div></div>' +
       '<div class="notice">الدفع عند الاستلام · التوصيل لجميع أنحاء المغرب</div></div>';
   }
 
@@ -51,6 +51,62 @@
       const radio = card.querySelector("[data-offer-radio]");
       if (radio) radio.textContent = selected ? "●" : "○";
     });
+  };
+
+  window.addTattoouiOfferToCart = function(id, type, event) {
+    if (event) event.stopPropagation();
+    selectTattoouiOffer(id, type);
+    const p = products.find(x => x.id === id);
+    if (!p) return false;
+    const stock = Number(p.stock);
+    if (!Number.isFinite(stock) || stock <= 0) {
+      toast(currentLanguage === "ar" ? "هذا المنتج غير متوفر حالياً" : "This product is currently out of stock");
+      return false;
+    }
+    if (type === "bundle") {
+      if (!eligible(p)) {
+        toast(currentLanguage === "ar" ? "هذا العرض غير متوفر حالياً" : "This offer is no longer available");
+        return false;
+      }
+      const otherBundle = cart.find(x => x.bundleOffer && x.id !== id);
+      if (otherBundle) {
+        toast(currentLanguage === "ar" ? "يمكنك اختيار عرض واحد فقط في الطلب الواحد." : "Only one bundle offer can be used per order.");
+        return false;
+      }
+      const row = cart.find(x => x.id === id);
+      if (row && !row.bundleOffer) {
+        toast(currentLanguage === "ar" ? "هذا التصميم موجود في السلة. احذف القطعة الحالية أولاً لإضافة عرض 2 + 1." : "This design is already in your cart. Remove it first to add the 2 + 1 offer.");
+        return false;
+      }
+      if (row) {
+        toast(currentLanguage === "ar" ? "عرض 2 + 1 موجود بالفعل في السلة" : "The 2 + 1 offer is already in your cart");
+        return false;
+      }
+      if (stock < 2) {
+        toast(currentLanguage === "ar" ? "الكمية المتوفرة لا تكفي لهذا العرض" : "Not enough stock for this offer");
+        return false;
+      }
+      cart.push({ id, qty: 2, bundleOffer: true });
+    } else {
+      const qty = getProductQty();
+      const row = cart.find(x => x.id === id);
+      if (row?.bundleOffer) {
+        toast(currentLanguage === "ar" ? "هذا التصميم موجود ضمن عرض 2 + 1 في السلة" : "This design is already in your cart as a 2 + 1 offer");
+        return false;
+      }
+      if (row && Number.isFinite(stock) && row.qty + qty > stock) {
+        toast(currentLanguage === "ar" ? "الكمية المتوفرة غير كافية" : "Not enough stock available");
+        return false;
+      }
+      if (row) row.qty += qty;
+      else cart.push({ id, qty });
+      metaTrack("AddToCart", { content_ids: [String(p.dbId || p.id)], content_type: "product", content_name: p.name, value: Number(p.price) * qty, currency: "MAD" });
+    }
+    localStorage.setItem("tattooui-cart", JSON.stringify(cart));
+    updateBadge();
+    animateToCart(p, document.getElementById("mainProductImg"));
+    toast(currentLanguage === "ar" ? "تمت الإضافة إلى السلة" : "Added to cart");
+    return true;
   };
 
   window.confirmTattoouiOffer = function(id, type, event) {
