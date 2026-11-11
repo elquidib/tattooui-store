@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
   }
 
   const corsHeaders = getCorsHeaders(req);
-  if (req.method === "OPTIONS") return new Response("ok", { status: 204, headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
   if (req.method !== "POST") return json(req, { error: "Method not allowed." }, 405);
 
   const turnstileSecret = Deno.env.get("TURNSTILE_SECRET_KEY");
