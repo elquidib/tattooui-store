@@ -1,177 +1,27 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111111">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<title>Tattooui | تأكيد الطلبات</title>
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="apple-touch-icon" href="../favicon.svg">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../supabase-config.js"></script>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111"><title>TATTO✦OUI | فريق الطلبات</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="../supabase-config.js"></script>
 <style>
-:root{color-scheme:light;--ink:#171717;--muted:#777;--line:#e9e5de;--paper:#f7f6f2;--white:#fff;--green:#16794b;--red:#b42318;--amber:#946200}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
-button,input{font:inherit}button{border:0;border-radius:14px;padding:15px 18px;font-weight:800;cursor:pointer;min-height:52px}button:disabled{opacity:.55;cursor:wait}
-.shell{max-width:620px;margin:auto;padding:16px 14px calc(28px + env(safe-area-inset-bottom))}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 2px 18px}
-.brand{font-weight:900;letter-spacing:.08em;font-size:19px}.brand span{padding:0 3px}
-.sub{font-size:12px;color:var(--muted);margin-top:3px}
-.smallbtn{min-height:40px;padding:9px 13px;background:#eeeae3;color:#222;border-radius:11px;font-size:13px}
-.panel{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 4px 18px #00000005}
-h1,h2,h3,p{margin-top:0}h1{font-size:22px;margin-bottom:7px}h2{font-size:18px;margin-bottom:12px}
-.muted{color:var(--muted)}.error{color:var(--red);font-size:13px}.success{color:var(--green);font-size:13px}
-label{display:block;font-size:13px;font-weight:800;margin:12px 0 6px}
-input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}
-.primary{background:#111;color:#fff;width:100%;margin-top:16px}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.tab{background:#ebe8e1;color:#333}.tab.active{background:#111;color:#fff}
-.order-picker{margin-bottom:12px}.picker-nav{display:grid;grid-template-columns:46px minmax(0,1fr) 46px;gap:8px;align-items:center;direction:ltr}.picker-arrow{min-height:48px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:13px;color:#222;font-size:23px;line-height:1}.picker-arrow:disabled{opacity:.3}.picker-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:48px;padding:10px 14px;background:#fff;border:1px solid var(--line);border-radius:13px;color:#222;direction:rtl}.picker-toggle b{font-size:14px}.picker-toggle span{font-size:12px;color:var(--muted)}.picker-strip{display:flex;gap:7px;overflow-x:auto;overscroll-behavior-x:contain;padding:9px 2px 5px;scrollbar-width:none}.picker-strip::-webkit-scrollbar{display:none}.order-chip{flex:0 0 auto;min-width:54px;min-height:39px;padding:8px 11px;border-radius:10px;background:#f0eee9;color:#333;font-size:13px}.order-chip.selected{background:#171717;color:#fff}.order-chip.follow{outline:1px solid #e4c66f}.order-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
-.order-no{font-size:12px;color:var(--muted);font-weight:800}
-.pill{background:#fff4d7;color:#775300;padding:6px 10px;border-radius:99px;font-size:11px;font-weight:800}
-.customer{font-size:22px;font-weight:900;margin-bottom:12px}
-.info{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.info div{background:#faf9f6;border:1px solid var(--line);padding:11px;border-radius:12px;min-width:0}
-.info small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
-.info strong{font-size:14px;overflow-wrap:anywhere}
-.address{grid-column:1/-1}
-.products{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
-.product-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:7px 0}
-.total{display:flex;justify-content:space-between;border-top:1px dashed var(--line);padding-top:12px;margin-top:6px;font-weight:900;font-size:18px}
-.call,.whatsapp{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;border-radius:14px;padding:13px;font-weight:900;margin-top:10px;min-height:50px}.call{background:#eaf5ee;color:#176b42}.whatsapp{background:#e9f7ee;color:#087443;border:1px solid #cce8d5}.message-wa{display:flex;align-items:center;justify-content:center;margin-top:10px;background:#087443;color:#fff;text-decoration:none;border-radius:12px;padding:13px;font-weight:900}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
-.confirm{background:#147849;color:white}.cancel{background:#fff0ee;color:#ad261d}.later{grid-column:1/-1;background:#fff4d7;color:#805600}
-.empty{text-align:center;padding:36px 16px;color:var(--muted)}.empty b{display:block;color:#222;font-size:17px;margin-bottom:6px}
-.hidden{display:none!important}.loading{text-align:center;color:var(--muted);padding:30px}
-.listrow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
-.listrow:last-child{border:0}.listrow b{display:block}.listrow small{color:var(--muted)}
-.notice{background:#fff8e7;color:#775300;border-radius:12px;padding:12px;font-size:12px;line-height:1.6;margin-bottom:12px}
-@media(max-width:360px){.info{grid-template-columns:1fr}.address{grid-column:auto}.actions{grid-template-columns:1fr}.later{grid-column:auto}}
-</style>
-</head>
-<body>
-<div class="shell">
-<header><div><div class="brand">TATTO<span>✦</span>OUI</div><div class="sub">لوحة تأكيد الطلبات</div></div><button id="logoutBtn" class="smallbtn hidden" type="button">خروج</button></header>
-
-<section id="loginPanel" class="panel">
-<h1>مرحباً بك</h1><p class="muted">سجّلي الدخول للبدء في تأكيد الطلبات.</p>
-<form id="loginForm">
-<label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" required>
-<label for="password">كلمة المرور</label><input id="password" type="password" autocomplete="current-password" required>
-<button class="primary" id="loginBtn">دخول</button><p id="loginError" class="error"></p>
-</form>
-</section>
-
-<main id="app" class="hidden">
-<div class="panel" style="padding:14px 16px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><b id="staffName">فريق تأكيد الطلبات</b><div class="sub">اختاري الطلب واتصلي بالزبون</div></div><button id="refreshBtn" class="smallbtn" type="button">تحديث</button></div></div>
-<div class="tabs"><button class="tab active" id="newTab" type="button">طلبات جديدة <span id="newCount">0</span></button><button class="tab" id="followTab" type="button">اتصال لاحقاً <span id="followCount">0</span></button></div>
-<div id="message" aria-live="polite"></div>
-<section id="newView"><div id="newContent" class="loading">جاري تحميل الطلبات…</div></section>
-<section id="followView" class="hidden"><div id="followContent" class="loading">جاري تحميل الطلبات…</div></section>
-</main>
-</div>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#171717;--muted:#777;--line:#e9e5de;--green:#147849;--red:#b42318;--amber:#946200}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,Arial,sans-serif}button,input{font:inherit}button{border:0;border-radius:12px;padding:13px 15px;font-weight:800;cursor:pointer;min-height:46px}button:disabled{opacity:.5}.wrap{max-width:720px;margin:auto;padding:16px 13px calc(30px + env(safe-area-inset-bottom))}.top{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 16px}.brand{font-weight:950;letter-spacing:.08em;font-size:19px}.muted{color:var(--muted);font-size:13px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;margin-bottom:12px;box-shadow:0 3px 14px #00000005}h1{font-size:22px;margin:0 0 6px}h2{font-size:17px;margin:0 0 12px}label{display:block;font-size:13px;font-weight:800;margin:12px 0 6px}input{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}.primary{background:#111;color:#fff;width:100%;margin-top:15px}.soft{background:#eeeae3;color:#222}.error{color:var(--red);font-size:13px}.hidden{display:none!important}.tabs{display:flex;gap:7px;overflow:auto;margin:12px 0}.tab{white-space:nowrap;background:#ebe8e1;color:#333}.tab.active{background:#111;color:#fff}.toolbar{display:flex;gap:8px;align-items:center}.toolbar input{flex:1;min-width:0}.count{font-size:12px;color:var(--muted);white-space:nowrap}.orderhead{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:12px}.pill{background:#fff3d1;color:#795500;padding:5px 9px;border-radius:99px;font-size:11px;font-weight:800}.name{font-size:21px;font-weight:900;margin-bottom:10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.info{background:#faf9f6;border:1px solid var(--line);border-radius:11px;padding:10px;min-width:0}.info small{display:block;color:var(--muted);font-size:11px}.info b{font-size:14px;overflow-wrap:anywhere}.wide{grid-column:1/-1}.items{border-top:1px solid var(--line);margin-top:13px;padding-top:8px}.item{display:flex;justify-content:space-between;gap:10px;padding:7px 0;font-size:13px}.total{display:flex;justify-content:space-between;border-top:1px dashed var(--line);padding-top:12px;margin-top:6px;font-size:18px;font-weight:900}.links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.link{display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:12px;padding:13px;font-weight:900;min-height:46px}.call{background:#eaf5ee;color:#176b42}.wa{background:#e9f7ee;color:#087443}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.confirm{background:#147849;color:#fff}.cancel{background:#fff0ee;color:#ad261d}.later{grid-column:1/-1;background:#fff4d7;color:#805600}.empty{text-align:center;color:var(--muted);padding:28px 10px}.note{background:#fff8e7;color:#775300;border-radius:11px;padding:11px;font-size:12px;line-height:1.6;margin-bottom:10px}@media(max-width:390px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.actions{grid-template-columns:1fr}.later{grid-column:auto}}
+</style></head><body><div class="wrap">
+<header class="top"><div><div class="brand">TATTO✦OUI</div><div class="muted">لوحة فريق تأكيد الطلبات</div></div><button id="logout" class="soft hidden">خروج</button></header>
+<section id="login" class="card"><h1>مرحباً بك 🌸</h1><p class="muted">دخلي اسم المستخدم والرمز السري ديالك.</p><form id="loginForm"><label>اسم المستخدم</label><input id="username" autocomplete="username" required minlength="3"><label>PIN — ستة أرقام</label><input id="pin" inputmode="numeric" autocomplete="current-password" pattern="[0-9]{6}" maxlength="6" required><button class="primary" id="loginBtn">دخول</button><p id="loginError" class="error" aria-live="polite"></p></form></section>
+<main id="app" class="hidden"><section class="card"><div class="toolbar"><div style="flex:1"><b id="staffName">فريق الطلبات</b><div class="muted">اختاري الطلب وتواصلي مع الزبون</div></div><button id="refresh" class="soft">تحديث</button></div></section>
+<div class="toolbar"><input id="search" placeholder="بحث برقم الطلب أو الاسم أو الهاتف..." aria-label="بحث"><span id="resultCount" class="count"></span></div>
+<nav class="tabs" id="tabs"><button class="tab active" data-status="new">جديدة</button><button class="tab" data-status="confirmed">مؤكدة</button><button class="tab" data-status="shipped">خرجت للتوصيل</button><button class="tab" data-status="delivered">تم التسليم</button><button class="tab" data-status="cancelled">ملغاة</button><button class="tab" data-status="follow">اتصال لاحقاً</button></nav>
+<div id="message" class="muted" aria-live="polite"></div><div id="orders"></div></main></div>
 <script>
-(function(){
- const cfg=window.TATTOOUI_SUPABASE;
- if(!cfg||!window.supabase){document.getElementById('loginError').textContent='تعذر الاتصال بالخدمة. يرجى تحديث الصفحة.';return;}
- const db=window.supabase.createClient(cfg.url,cfg.publishableKey);
- const $=id=>document.getElementById(id);
- let newOrders=[],followOrders=[],items=[],activeTab='new',busy=false,selectedId=null,pickerOpen=false,lastConfirmedOrder=null;
- const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const money=v=>Number(v||0).toLocaleString('fr-FR',{maximumFractionDigits:2})+' DH';
- function say(msg,type){if(!msg){$('message').innerHTML='';return;}let extra='';if(type==='confirmed'&&lastConfirmedOrder){extra='<a class="message-wa" target="_blank" rel="noopener" href="'+esc(whatsappUrl(lastConfirmedOrder,'confirmed'))+'">● WhatsApp – إرسال رسالة التأكيد</a>';} $('message').innerHTML='<div class="panel '+(type==='error'?'error':'success')+'">'+esc(msg)+extra+'</div>';}
- const WA_MESSAGES={new:'سلام {{name}}،\n\nتوصلنا بالطلب ديالك من TATTO✦OUI!\n\nواش كتأكد لينا الطلب باش نوجدو ليك؟\n\nالمجموع: {{total}} درهم.',confirmed:'سلام {{name}}،\n\nطلبك تأكد بنجاح من TATTO✦OUI.\n\nغادي يوصلك غالباً خلال يوم حتى يومين.\nخليك منتبه للتليفون ديالك، الموزع غادي يتاصل بيك قبل التوصيل.\n\nشكراً على ثقتك فينا 🤍'};
- function normalizeMoroccanPhone(value){let digits=String(value||'').replace(/\D/g,'');if(digits.startsWith('00212'))digits=digits.slice(5);else if(digits.startsWith('212'))digits=digits.slice(3);if(/^[67][0-9]{8}$/.test(digits))digits='0'+digits;return /^0[67][0-9]{8}$/.test(digits)?digits:'';}
- function whatsappUrl(o,type){const localPhone=normalizeMoroccanPhone(o.phone);if(!localPhone)return '#';const phone='212'+localPhone.slice(1);const msg=WA_MESSAGES[type].replace(/{{name}}/g,o.customer_name||'').replace(/{{total}}/g,money(o.total));return 'https://wa.me/'+phone+'?text='+encodeURIComponent(msg);}
- function setBusy(v){busy=v;document.querySelectorAll('.actions button').forEach(b=>b.disabled=v);}
- function setTab(tab){activeTab=tab;$('newView').classList.toggle('hidden',tab!=='new');$('followView').classList.toggle('hidden',tab!=='follow');$('newTab').classList.toggle('active',tab==='new');$('followTab').classList.toggle('active',tab==='follow');say('');}
- $('newTab').addEventListener('click',()=>setTab('new'));$('followTab').addEventListener('click',()=>setTab('follow'));
- function card(o,follow=false){
-  const oi=items.filter(i=>i.order_id===o.id);
-  const phone=normalizeMoroccanPhone(o.phone);
-  const isConfirmed=o.status==='confirmed';
-  const productHtml=oi.map(i=>'<div class="product-row"><span>'+esc(i.product_name)+' × '+esc(i.quantity)+'</span><b>'+money(i.line_total)+'</b></div>').join('');
-  const statusLabel=isConfirmed?'تم التأكيد':(follow?'اتصال لاحقاً':'طلب جديد');
-  const waType=isConfirmed?'confirmed':'new';
-  const waLabel=isConfirmed?'● WhatsApp – معلومات التوصيل':'● WhatsApp – رسالة تأكيد الطلب';
-  const actionButtons=isConfirmed
-   ?'<button class="confirm" type="button" disabled>✓ تم تأكيد الطلب</button><button class="cancel" data-action="cancelled" data-id="'+esc(o.id)+'">إلغاء الطلب</button>'
-   :'<button class="confirm" data-action="confirmed" data-id="'+esc(o.id)+'">تأكيد الطلب</button><button class="cancel" data-action="cancelled" data-id="'+esc(o.id)+'">إلغاء الطلب</button><button class="later" data-action="later" data-id="'+esc(o.id)+'">الاتصال لاحقاً</button>';
-  return '<article class="panel"><div class="order-head"><span class="order-no">طلب '+esc(o.order_number||String(o.id).slice(0,8))+'</span><span class="pill">'+statusLabel+'</span></div>'+
-   '<div class="customer">'+esc(o.customer_name||'زبون بدون اسم')+'</div>'+
-   '<div class="info"><div><small>الهاتف</small><strong dir="ltr">'+esc(normalizeMoroccanPhone(o.phone)||'—')+'</strong></div><div><small>المدينة</small><strong>'+esc(o.city||'—')+'</strong></div><div class="address"><small>العنوان</small><strong>'+esc(o.address||'—')+'</strong></div>'+
-   (o.notes?'<div class="address"><small>ملاحظات</small><strong>'+esc(o.notes)+'</strong></div>':'')+'</div>'+
-   '<a class="whatsapp" target="_blank" rel="noopener" href="'+esc(whatsappUrl(o,waType))+'">'+waLabel+'</a>'+'<a class="call" href="tel:'+esc(phone)+'">☎ الاتصال بالزبون</a>'+
-   '<div class="products">'+(productHtml||'<div class="muted">تفاصيل المنتجات غير متوفرة</div>')+'</div>'+
-   '<div class="total"><span>المجموع</span><span>'+money(o.total)+'</span></div>'+
-   '<div class="actions">'+actionButtons+'</div></article>';
- }
- function orderLabel(o){return o.order_number??String(o.id).slice(0,6);}
- function render(){
-  $('newCount').textContent=newOrders.length;$('followCount').textContent=followOrders.length;
-  const allPending=[...newOrders,...followOrders].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-  if(!allPending.some(o=>o.id===selectedId))selectedId=allPending[0]?.id??null;
-  const selected=allPending.find(o=>o.id===selectedId);
-  const isFollow=selected?followOrders.some(o=>o.id===selected.id):false;
-  const selectedIndex=allPending.findIndex(o=>o.id===selectedId);
-  const picker='<div class="order-picker"><div class="picker-nav"><button id="previousOrder" class="picker-arrow" type="button" aria-label="الطلب السابق" '+(selectedIndex<=0?'disabled':'')+'>←</button><button id="pickerToggle" class="picker-toggle" type="button"><b>طلب '+(selected?esc(orderLabel(selected)):'—')+'　⌄</b><span>'+allPending.length+' طلب متاح · الأحدث أولاً</span></button><button id="nextOrder" class="picker-arrow" type="button" aria-label="الطلب التالي" '+(selectedIndex<0||selectedIndex>=allPending.length-1?'disabled':'')+'>→</button></div>'+
-   (pickerOpen?'<div class="picker-strip" aria-label="اختيار الطلب">'+allPending.map(o=>'<button type="button" class="order-chip '+(o.id===selectedId?'selected':'')+' '+(followOrders.some(f=>f.id===o.id)?'follow':'')+'" data-select-order="'+esc(o.id)+'">'+esc(orderLabel(o))+'</button>').join('')+'</div>':'')+'</div>';
-  $('newContent').innerHTML=picker+(selected?'<div class="notice">اختاري أي رقم من القائمة لفتح الطلب مباشرة. الطلبات مرتبة من الأحدث إلى الأقدم.</div>'+card(selected,isFollow):'<div class="panel empty"><b>لا توجد طلبات معلّقة</b>ستظهر هنا الطلبات الجديدة واتصالات المتابعة.</div>');
-  $('followContent').innerHTML=followOrders.length?followOrders.map(o=>'<div class="listrow" data-follow-open="'+esc(o.id)+'"><div><b>طلب '+esc(orderLabel(o))+' · '+esc(o.customer_name||'بدون اسم')+'</b><small>'+esc(o.city||'')+'</small></div><span>فتح ←</span></div>').join(''):'<div class="panel empty"><b>لا توجد اتصالات مؤجلة</b>الطلبات التي تختارين لها الاتصال لاحقاً ستظهر هنا.</div>';
-  const toggle=$('pickerToggle');if(toggle)toggle.addEventListener('click',()=>{pickerOpen=!pickerOpen;render();});
-  const previous=$('previousOrder');if(previous)previous.addEventListener('click',()=>{if(selectedIndex>=0&&selectedIndex<allPending.length-1){selectedId=allPending[selectedIndex+1].id;pickerOpen=false;render();}});
-  const next=$('nextOrder');if(next)next.addEventListener('click',()=>{if(selectedIndex>0){selectedId=allPending[selectedIndex-1].id;pickerOpen=false;render();}});
-  document.querySelectorAll('[data-select-order]').forEach(b=>b.addEventListener('click',()=>{selectedId=b.dataset.selectOrder;pickerOpen=false;setTab('new');render();}));
-  document.querySelectorAll('[data-follow-open]').forEach(b=>b.addEventListener('click',()=>{selectedId=b.dataset.followOpen;setTab('new');render();}));
- }
- async function load(){
-  say('');
-  const fr=await db.from('staff_order_followups').select('order_id,updated_at').order('updated_at',{ascending:false});
-  if(fr.error){say('تعذر تحميل قائمة الاتصال لاحقاً: '+fr.error.message,'error');return;}
-  const fids=(fr.data||[]).map(x=>x.order_id);
-  const nr=await db.from('orders').select('id,order_number,customer_name,phone,city,address,notes,total,status,created_at').in('status',['new','confirmed']).order('created_at',{ascending:false});
-  if(nr.error){say('تعذر تحميل الطلبات: '+nr.error.message,'error');return;}
-  const all=nr.data||[];
-  newOrders=all.filter(o=>o.status==='confirmed'||!fids.includes(o.id));followOrders=all.filter(o=>o.status==='new'&&fids.includes(o.id));
-  const ids=all.map(o=>o.id);
-  if(ids.length){const ir=await db.from('order_items').select('order_id,product_name,quantity,line_total').in('order_id',ids);if(ir.error){say('تعذر تحميل تفاصيل المنتجات: '+ir.error.message,'error');return;}items=ir.data||[];}else items=[];
-  render();
- }
- async function handleAction(action,id){
-  if(busy)return;
-  const label=action==='confirmed'?'تأكيد هذا الطلب؟':action==='cancelled'?'هل تريدين إلغاء هذا الطلب؟':'إضافة هذا الطلب إلى قائمة الاتصال لاحقاً؟';
-  if(!window.confirm(label))return;
-  setBusy(true);say('');
-  const rpc=action==='later'?'staff_mark_call_later':'staff_mark_order_status';
-  const args=action==='later'?{p_order_id:id}:{p_order_id:id,p_status:action};
-  const r=await db.rpc(rpc,args);
-  setBusy(false);
-  if(r.error){say('لم يتم حفظ التغيير: '+r.error.message,'error');return;}
-  if(action==='confirmed'){lastConfirmedOrder=newOrders.concat(followOrders).find(o=>o.id===id)||null;selectedId=id;}
-  else selectedId=null;
-  pickerOpen=false;
-  await load();
-  if(action==='confirmed')say('تم تأكيد الطلب بنجاح. أرسلي للزبون رسالة التأكيد:', 'confirmed');
-  else say(action==='cancelled'?'تم إلغاء الطلب.':'تمت إضافة الطلب إلى قائمة الاتصال لاحقاً.','success');
- }
- document.addEventListener('click',e=>{const b=e.target.closest('button[data-action]');if(b)handleAction(b.dataset.action,b.dataset.id);});
- async function enter(session){
-  if(!session){$('loginPanel').classList.remove('hidden');$('app').classList.add('hidden');$('logoutBtn').classList.add('hidden');return;}
-  const pr=await db.from('profiles').select('id,full_name,role').eq('id',session.user.id).maybeSingle();
-  if(pr.error||!pr.data||pr.data.role!=='order_confirmer'){
-   await db.auth.signOut();$('loginError').textContent='هذا الحساب غير مفعّل لتأكيد الطلبات. تواصلي مع المسؤول.';return;
-  }
-  $('loginPanel').classList.add('hidden');$('app').classList.remove('hidden');$('logoutBtn').classList.remove('hidden');$('staffName').textContent=pr.data.full_name||'موظفة تأكيد الطلبات';
-  await load();
- }
- $('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginBtn').disabled=true;$('loginError').textContent='';const r=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});$('loginBtn').disabled=false;if(r.error){$('loginError').textContent='البريد الإلكتروني أو كلمة المرور غير صحيحة.';return;}await enter(r.data.session);});
- $('logoutBtn').addEventListener('click',async()=>{await db.auth.signOut();location.reload();});
- $('refreshBtn').addEventListener('click',load);
- db.auth.getSession().then(({data})=>enter(data.session));
- db.auth.onAuthStateChange((_event,session)=>{if(!session){$('app').classList.add('hidden');$('loginPanel').classList.remove('hidden');$('logoutBtn').classList.add('hidden');}});
- if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+(()=>{const cfg=window.TATTOOUI_SUPABASE;if(!cfg||!window.supabase){document.getElementById('loginError').textContent='تعذر الاتصال بالخدمة.';return}const sb=window.supabase.createClient(cfg.url,cfg.publishableKey);const endpoint=cfg.url+'/functions/v1/staff-portal';const $=id=>document.getElementById(id);let token=localStorage.getItem('tattooui_staff_token')||'',orders=[],items=[],followups=[],staff=null,tab='new',busy=false;
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const money=v=>Number(v||0).toLocaleString('fr-MA',{maximumFractionDigits:2})+' DH';
+async function api(action,data={},auth=token){const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','apikey':cfg.publishableKey,...(auth?{Authorization:'Bearer '+auth}:{})},body:JSON.stringify({action,...data})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'تعذر تنفيذ العملية');return j}
+function phone(v){let d=String(v||'').replace(/\D/g,'');if(d.startsWith('00212'))d=d.slice(5);else if(d.startsWith('212'))d=d.slice(3);if(/^[67]\d{8}$/.test(d))d='0'+d;return /^0[67]\d{8}$/.test(d)?d:''}
+function wa(o,type){const p=phone(o.phone);if(!p)return '#';const product=(items.filter(i=>i.order_id===o.id).map(i=>i.product_name+' × '+i.quantity).join('، '))||'الطلب ديالك';let msg='';if(type==='new')msg='سلام '+(o.customer_name||'')+' 🌸\n\nمعاك TATTO✦OUI. توصلنا بالطلب ديالك ديال '+product+'.\n\n💰 المجموع: '+money(o.total)+'.\n\nواش نأكدو ليك الطلب ونصيفطوه؟ 😊\n\nجاوبينا بـ «نعم» للتأكيد أو «إلغاء» إلا بدلتي رأيك.\n\nشكراً على ثقتك فينا ❤️';else if(type==='confirmed')msg='شكراً '+(o.customer_name||'')+' ❤️\n\nطلبك تأكد بنجاح من TATTO✦OUI! 📦\n\nعافاك خلي تلفونك قريب منك، وجاوبي على اتصال الموزع باش توصلك الطلبية بلا تأخير.\n\nغادي نتواصلو معاك بخصوص موعد التوصيل.\n\nنهارك مبروك 🌸';else msg='سلام '+(o.customer_name||'')+' ❤️\n\nطلبك من TATTO✦OUI خرج للتوصيل 🚚\n\nخلي تلفونك قريب منك وجاوبي على اتصال الموزع باش يستلمك الطلب.\n\nشكراً على ثقتك فينا 🌸';return 'https://wa.me/212'+p.slice(1)+'?text='+encodeURIComponent(msg)}
+function render(){const q=$('search').value.trim().toLowerCase();let list=orders.filter(o=>(tab==='follow'?o.status==='new'&&followups.some(f=>f.order_id===o.id):o.status===tab)&&(!q||[o.order_number,o.customer_name,o.phone,o.city].join(' ').toLowerCase().includes(q)));$('resultCount').textContent=list.length+' طلب';$('orders').innerHTML=list.length?list.map(o=>{const oi=items.filter(i=>i.order_id===o.id),isNew=o.status==='new';const label={new:'طلب جديد',confirmed:'تم التأكيد',shipped:'خرج للتوصيل',delivered:'تم التسليم',cancelled:'ملغى'}[o.status]||o.status;return '<article class="card"><div class="orderhead"><b class="muted">طلب #'+esc(o.order_number)+'</b><span class="pill">'+label+'</span></div><div class="name">'+esc(o.customer_name)+'</div><div class="grid"><div class="info"><small>الهاتف</small><b dir="ltr">'+esc(phone(o.phone)||o.phone||'—')+'</b></div><div class="info"><small>المدينة</small><b>'+esc(o.city||'—')+'</b></div><div class="info wide"><small>العنوان</small><b>'+esc(o.address||'—')+'</b></div>'+(o.notes?'<div class="info wide"><small>ملاحظات</small><b>'+esc(o.notes)+'</b></div>':'')+'</div><div class="items">'+(oi.map(i=>'<div class="item"><span>'+esc(i.product_name)+' × '+esc(i.quantity)+'</span><b>'+money(i.line_total)+'</b></div>').join('')||'<span class="muted">تفاصيل المنتجات غير متوفرة</span>')+'</div><div class="total"><span>المجموع</span><span>'+money(o.total)+'</span></div><div class="links"><a class="link call" href="tel:'+esc(phone(o.phone))+'">☎ اتصال</a><a class="link wa" target="_blank" rel="noopener" href="'+esc(wa(o,o.status==='new'?'new':o.status==='confirmed'?'confirmed':'shipped'))+'">WhatsApp · مراجعة وإرسال</a></div>'+(isNew?'<div class="actions"><button class="confirm" data-action="confirmed" data-id="'+o.id+'">✓ تأكيد</button><button class="cancel" data-action="cancelled" data-id="'+o.id+'">إلغاء</button><button class="later" data-action="later" data-id="'+o.id+'">اتصال لاحقاً</button></div>':'')+'</article>'}).join(''):'<section class="card empty">ما كاين حتى طلب فهاد اللائحة حالياً.</section>'}
+async function load(){ $('message').textContent='جاري تحديث الطلبات…';try{const d=await api('list_orders');orders=d.orders||[];items=d.items||[];followups=d.followups||[];staff=d.staff;$('staffName').textContent=staff.display_name;render();$('message').textContent='آخر تحديث: '+new Date().toLocaleTimeString('fr-MA')}catch(e){if(/انتهت الجلسة/.test(e.message)){logout();return}$('message').textContent=e.message}}
+async function enter(){try{const d=await api('list_orders');orders=d.orders||[];items=d.items||[];followups=d.followups||[];staff=d.staff;$('staffName').textContent=staff.display_name;$('login').classList.add('hidden');$('app').classList.remove('hidden');$('logout').classList.remove('hidden');render();$('message').textContent='تم تسجيل الدخول بنجاح'}catch(e){localStorage.removeItem('tattooui_staff_token');token='';$('loginError').textContent=e.message}}
+function logout(){if(token)api('logout').catch(()=>{});token='';localStorage.removeItem('tattooui_staff_token');$('app').classList.add('hidden');$('logout').classList.add('hidden');$('login').classList.remove('hidden')}
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginBtn').disabled=true;$('loginError').textContent='';try{const d=await api('login',{username:$('username').value,pin:$('pin').value},'');token=d.token;localStorage.setItem('tattooui_staff_token',token);$('pin').value='';await enter()}catch(err){$('loginError').textContent=err.message}finally{$('loginBtn').disabled=false}});
+$('logout').addEventListener('click',logout);$('refresh').addEventListener('click',load);$('search').addEventListener('input',render);$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-status]');if(!b)return;tab=b.dataset.status;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));render()});
+$('orders').addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b||busy)return;const action=b.dataset.action,id=b.dataset.id;const prompt=action==='later'?'نضيفو هاد الطلب للاتصال لاحقاً؟':action==='confirmed'?'نأكدو هاد الطلب؟':'نلغيو هاد الطلب؟';if(!confirm(prompt))return;busy=true;b.disabled=true;try{await api(action==='later'?'mark_call_later':'set_status',{order_id:id,...(action==='later'?{}:{status:action})});await load();$('message').textContent=action==='confirmed'?'تأكد الطلب. افتحي WhatsApp إذا بغيتي تصيفطي رسالة التأكيد.':'تم حفظ التغيير.'}catch(err){$('message').textContent=err.message}finally{busy=false}});
+if(token)enter();
 })();
-</script>
-</body>
-</html>
+</script></body></html>
