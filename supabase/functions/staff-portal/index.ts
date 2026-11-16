@@ -98,13 +98,23 @@ Deno.serve(async req=>{
     orders.push(...(page||[]));
     if(!page||page.length<pageSize)break;
    }
+   // Keep PostgREST URLs bounded: the full order history can contain hundreds or thousands of IDs.
    const ids=(orders||[]).map(o=>o.id);
-   const [items,followups]=ids.length?await Promise.all([
-    db.from("order_items").select("order_id,product_name,quantity,line_total").in("order_id",ids),
-    db.from("staff_order_followups").select("order_id,updated_at").in("order_id",ids)
-   ]):[{data:[],error:null},{data:[],error:null}];
-   if(items.error)throw items.error;if(followups.error)throw followups.error;
-   return json({orders:orders||[],items:items.data||[],followups:followups.data||[],staff:session.account});
+   const allItems:any[]=[];
+   const allFollowups:any[]=[];
+   const idBatchSize=100;
+   for(let i=0;i<ids.length;i+=idBatchSize){
+    const batch=ids.slice(i,i+idBatchSize);
+    const [items,followups]=await Promise.all([
+     db.from("order_items").select("order_id,product_name,quantity,line_total").in("order_id",batch),
+     db.from("staff_order_followups").select("order_id,updated_at").in("order_id",batch)
+    ]);
+    if(items.error)throw items.error;
+    if(followups.error)throw followups.error;
+    allItems.push(...(items.data||[]));
+    allFollowups.push(...(followups.data||[]));
+   }
+   return json({orders:orders||[],items:allItems,followups:allFollowups,staff:session.account});
   }
   if(action==="mark_call_later"){
    const id=String(body.order_id||"");const {data:o,error}=await db.from("orders").select("id,status").eq("id",id).maybeSingle();
