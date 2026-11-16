@@ -91,7 +91,6 @@ Deno.serve(async req=>{
    for(let from=0;;from+=pageSize){
     const {data:page,error}=await db.from("orders")
      .select("id,order_number,customer_name,phone,city,address,notes,total,subtotal,shipping,status,created_at")
-     .in("status",["new","confirmed","shipped","delivered","cancelled"])
      .order("created_at",{ascending:false})
      .order("id",{ascending:false})
      .range(from,from+pageSize-1);
