@@ -84,6 +84,18 @@ Deno.serve(async req=>{
    return json({error:"Unknown admin action"},400);
   }
   const session=await staffSession(req);if(!session)return json({error:"انتهت الجلسة. سجّلي الدخول من جديد."},401);
+  if(action==="edit_order"){
+   const id=String(body.order_id||""),customerName=String(body.customer_name||"").trim(),city=String(body.city||"").trim(),address=String(body.address||"").trim();
+   if(!/^[0-9a-f-]{36}$/i.test(id))return json({error:"معرّف الطلب غير صحيح."},400);
+   if(!customerName||customerName.length>120||!city||city.length>120||!address||address.length>500)return json({error:"يرجى إدخال الاسم والمدينة والعنوان بشكل صحيح."},400);
+   const {data:before,error:readError}=await db.from("orders").select("id,customer_name,city,address").eq("id",id).maybeSingle();
+   if(readError)throw readError;if(!before)return json({error:"الطلب غير موجود."},404);
+   const {error}=await db.from("orders").update({customer_name:customerName,city,address,updated_at:new Date().toISOString()}).eq("id",id);
+   if(error)throw error;
+   const audit=await db.from("staff_order_actions").insert({order_id:id,staff_id:session.account.id,action_type:"edited"});
+   if(audit.error)throw audit.error;
+   return json({ok:true});
+  }
   if(action==="list_orders"){
    // Load every order in stable pages so repeat-customer counts never silently stop at 250.
    const orders:any[]=[];
