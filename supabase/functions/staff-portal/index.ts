@@ -138,11 +138,15 @@ Deno.serve(async req=>{
   if(action==="set_status"){
    const id=String(body.order_id||""),status=String(body.status||"");
    if(!["confirmed","cancelled"].includes(status))return json({error:"الحالة غير مسموحة."},400);
+   const reason=String(body.reason||"").trim();
+   if(status==="cancelled"&&(!reason||reason.length>180))return json({error:"سبب الإلغاء مطلوب (حتى 180 حرفاً)."},400);
    const {data:o,error}=await db.from("orders").select("id,status").eq("id",id).maybeSingle();
    if(error)throw error;if(!o||o.status!=="new")return json({error:"هذا الطلب لم يعد جديداً."},409);
    const r=await db.from("orders").update({status,updated_at:new Date().toISOString()}).eq("id",id).eq("status","new").select("id").maybeSingle();
    if(r.error)throw r.error;if(!r.data)return json({error:"تم تغيير الطلب من طرف مستخدم آخر. حدّثي القائمة."},409);
-   await db.from("staff_order_actions").insert({order_id:id,staff_id:session.account.id,action_type:status});
+   const actionType=status==="cancelled"?"cancelled:"+reason:"confirmed";
+   const audit=await db.from("staff_order_actions").insert({order_id:id,staff_id:session.account.id,action_type:actionType});
+   if(audit.error)throw audit.error;
    await db.from("staff_order_followups").delete().eq("order_id",id);
    return json({ok:true});
   }
