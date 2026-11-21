@@ -114,19 +114,23 @@ Deno.serve(async req=>{
    const ids=(orders||[]).map(o=>o.id);
    const allItems:any[]=[];
    const allFollowups:any[]=[];
+   const allActions:any[]=[];
    const idBatchSize=100;
    for(let i=0;i<ids.length;i+=idBatchSize){
     const batch=ids.slice(i,i+idBatchSize);
-    const [items,followups]=await Promise.all([
+    const [items,followups,actions]=await Promise.all([
      db.from("order_items").select("order_id,product_name,quantity,line_total").in("order_id",batch),
-     db.from("staff_order_followups").select("order_id,updated_at").in("order_id",batch)
+     db.from("staff_order_followups").select("order_id,updated_at").in("order_id",batch),
+     db.from("staff_order_actions").select("order_id,action_type,created_at").in("order_id",batch).order("created_at",{ascending:false})
     ]);
     if(items.error)throw items.error;
     if(followups.error)throw followups.error;
+    if(actions.error)throw actions.error;
     allItems.push(...(items.data||[]));
     allFollowups.push(...(followups.data||[]));
+    allActions.push(...(actions.data||[]));
    }
-   return json({orders:orders||[],items:allItems,followups:allFollowups,staff:session.account});
+   return json({orders:orders||[],items:allItems,followups:allFollowups,actions:allActions,staff:session.account});
   }
   if(action==="mark_call_later"){
    const id=String(body.order_id||"");const {data:o,error}=await db.from("orders").select("id,status").eq("id",id).maybeSingle();
