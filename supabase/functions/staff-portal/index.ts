@@ -114,19 +114,23 @@ Deno.serve(async req=>{
    const ids=(orders||[]).map(o=>o.id);
    const allItems:any[]=[];
    const allFollowups:any[]=[];
+   const allActions:any[]=[];
    const idBatchSize=100;
    for(let i=0;i<ids.length;i+=idBatchSize){
     const batch=ids.slice(i,i+idBatchSize);
-    const [items,followups]=await Promise.all([
+    const [items,followups,actions]=await Promise.all([
      db.from("order_items").select("order_id,product_name,quantity,line_total").in("order_id",batch),
-     db.from("staff_order_followups").select("order_id,updated_at").in("order_id",batch)
+     db.from("staff_order_followups").select("order_id,updated_at").in("order_id",batch),
+     db.from("staff_order_actions").select("order_id,action_type,created_at").in("order_id",batch).order("created_at",{ascending:false})
     ]);
     if(items.error)throw items.error;
     if(followups.error)throw followups.error;
+    if(actions.error)throw actions.error;
     allItems.push(...(items.data||[]));
     allFollowups.push(...(followups.data||[]));
+    allActions.push(...(actions.data||[]));
    }
-   return json({orders:orders||[],items:allItems,followups:allFollowups,staff:session.account});
+   return json({orders:orders||[],items:allItems,followups:allFollowups,actions:allActions,staff:session.account});
   }
   if(action==="mark_call_later"){
    const id=String(body.order_id||"");const {data:o,error}=await db.from("orders").select("id,status").eq("id",id).maybeSingle();
@@ -138,11 +142,15 @@ Deno.serve(async req=>{
   if(action==="set_status"){
    const id=String(body.order_id||""),status=String(body.status||"");
    if(!["confirmed","cancelled"].includes(status))return json({error:"الحالة غير مسموحة."},400);
+   const reason=String(body.reason||"").trim();
+   if(status==="cancelled"&&(!reason||reason.length>180))return json({error:"سبب الإلغاء مطلوب (حتى 180 حرفاً)."},400);
    const {data:o,error}=await db.from("orders").select("id,status").eq("id",id).maybeSingle();
    if(error)throw error;if(!o||o.status!=="new")return json({error:"هذا الطلب لم يعد جديداً."},409);
    const r=await db.from("orders").update({status,updated_at:new Date().toISOString()}).eq("id",id).eq("status","new").select("id").maybeSingle();
    if(r.error)throw r.error;if(!r.data)return json({error:"تم تغيير الطلب من طرف مستخدم آخر. حدّثي القائمة."},409);
-   await db.from("staff_order_actions").insert({order_id:id,staff_id:session.account.id,action_type:status});
+   const actionType=status==="cancelled"?"cancelled:"+reason:"confirmed";
+   const audit=await db.from("staff_order_actions").insert({order_id:id,staff_id:session.account.id,action_type:actionType});
+   if(audit.error)throw audit.error;
    await db.from("staff_order_followups").delete().eq("order_id",id);
    return json({ok:true});
   }
