@@ -126,13 +126,12 @@ body.cart-open .language-switcher{display:none!important}
 #tattoouiMusic .tm-toggle{width:54px;height:54px;border:1px solid #d8b86a;border-radius:50%;background:linear-gradient(145deg,#e8cf8a,#b58b3b);color:#17130a;box-shadow:0 8px 26px rgba(0,0,0,.24);display:grid;place-items:center;font-size:19px;font-weight:800;transition:transform .2s,box-shadow .2s}
 #tattoouiMusic .tm-toggle:hover{transform:translateY(-2px);box-shadow:0 11px 30px rgba(0,0,0,.3)}
 #tattoouiMusic .tm-toggle:focus-visible,#tattoouiMusic button:focus-visible,#tattoouiMusic input:focus-visible{outline:2px solid #d8b86a;outline-offset:3px}
-#tattoouiMusic .tm-panel{display:none;align-items:center;gap:10px;padding:11px 13px;border:1px solid rgba(216,184,106,.55);border-radius:14px;background:rgba(17,17,17,.96);color:#f5f3ee;box-shadow:0 8px 28px rgba(0,0,0,.24);min-width:220px}
+#tattoouiMusic .tm-panel{display:none;align-items:center;padding:9px 12px;border:1px solid rgba(216,184,106,.55);border-radius:12px;background:rgba(17,17,17,.96);color:#f5f3ee;box-shadow:0 8px 24px rgba(0,0,0,.22);width:164px;min-width:164px}
 #tattoouiMusic.tm-open .tm-panel{display:flex}
 #tattoouiMusic .tm-meta{min-width:0;flex:1}
-#tattoouiMusic .tm-title{font-size:11px;font-weight:700;letter-spacing:.08em;white-space:nowrap}
+#tattoouiMusic .tm-title{font-size:10px;font-weight:700;letter-spacing:.07em;white-space:nowrap}
 #tattoouiMusic .tm-sub{font-size:10px;color:#c8b98f;margin-top:3px}
-#tattoouiMusic .tm-volume{width:72px;accent-color:#d8b86a}
-@media(max-width:560px){#tattoouiMusic{right:14px;bottom:max(112px,env(safe-area-inset-bottom));gap:8px}#tattoouiMusic .tm-toggle{width:50px;height:50px}#tattoouiMusic .tm-panel{min-width:0;padding:10px;gap:8px}#tattoouiMusic .tm-title{font-size:10px}#tattoouiMusic .tm-volume{width:58px}}
+@media(max-width:560px){#tattoouiMusic{right:14px;bottom:max(112px,env(safe-area-inset-bottom));gap:7px}#tattoouiMusic .tm-toggle{width:48px;height:48px}#tattoouiMusic .tm-panel{width:154px;min-width:154px;padding:8px 10px}}
 @media(prefers-reduced-motion:reduce){#tattoouiMusic .tm-toggle{transition:none}}
 </style>
 </head>
@@ -152,8 +151,6 @@ body.cart-open .language-switcher{display:none!important}
 <div id="tattoouiMusic" aria-label="TATTO✦OUI background music player">
   <div class="tm-panel" id="tattoouiMusicPanel" aria-label="Music controls">
     <div class="tm-meta"><div class="tm-title">TATTO✦OUI SOUND</div><div class="tm-sub" id="tattoouiMusicStatus" aria-live="polite">Music paused</div></div>
-    <label for="tattoouiMusicVolume" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">Music volume</label>
-    <input class="tm-volume" id="tattoouiMusicVolume" type="range" min="0" max="1" step="0.01" value="0.18" aria-label="Music volume">
   </div>
   <button class="tm-toggle" id="tattoouiMusicToggle" type="button" aria-label="Play background music" aria-pressed="false" title="Play music">♫</button>
   <audio id="tattoouiBackgroundAudio" preload="none" loop playsinline>
@@ -165,9 +162,8 @@ body.cart-open .language-switcher{display:none!important}
   const audio=document.getElementById("tattoouiBackgroundAudio");
   const toggle=document.getElementById("tattoouiMusicToggle");
   const player=document.getElementById("tattoouiMusic");
-  const volume=document.getElementById("tattoouiMusicVolume");
   const status=document.getElementById("tattoouiMusicStatus");
-  if(!audio||!toggle||!player||!volume||!status)return;
+  if(!audio||!toggle||!player||!status)return;
   audio.volume=0.18;
   let visitorPaused=false;
   const paint=()=>{
@@ -201,7 +197,6 @@ body.cart-open .language-switcher{display:none!important}
     }
     paint();
   });
-  volume.addEventListener("input",()=>{audio.volume=Number(volume.value);});
   audio.addEventListener("play",paint);
   audio.addEventListener("pause",paint);
   audio.addEventListener("error",()=>{status.textContent="Music unavailable";});
