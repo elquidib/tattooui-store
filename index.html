@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" translate="no">
+<html lang="fr" translate="no">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -198,11 +198,16 @@ let products = [
 ];
 let cart = JSON.parse(localStorage.getItem("tattooui-cart")||"[]");
 
+const TATTOOUI_LANGUAGE_DEFAULT_VERSION="fr-default-v1";
+if(localStorage.getItem("tattooui-language-default-version")!==TATTOOUI_LANGUAGE_DEFAULT_VERSION){
+  localStorage.setItem("tattooui-language","fr");
+  localStorage.setItem("tattooui-language-default-version",TATTOOUI_LANGUAGE_DEFAULT_VERSION);
+}
 let currentLanguage = localStorage.getItem("tattooui-language") || "fr";
 const TATTOOUI_LANGUAGES = {
-  en:{label:"English",flag:"gb",dir:"ltr"},
   fr:{label:"Français",flag:"fr",dir:"ltr"},
-  ar:{label:"العربية",flag:"ma",dir:"rtl"}
+  ar:{label:"العربية",flag:"ma",dir:"rtl"},
+  en:{label:"English",flag:"gb",dir:"ltr"}
 };
 const TATTOOUI_TRANSLATIONS = {
   fr:{
@@ -296,7 +301,7 @@ const TATTOOUI_TRANSLATIONS = {
   }
 };
 function languageSwitcher(){
-  const l=TATTOOUI_LANGUAGES[currentLanguage]||TATTOOUI_LANGUAGES.en;
+  const l=TATTOOUI_LANGUAGES[currentLanguage]||TATTOOUI_LANGUAGES.fr;
   return '<div class="language-switcher" onclick="event.stopPropagation()"><button class="language-trigger" type="button" aria-haspopup="true" aria-expanded="false" onclick="toggleLanguageMenu(event)"><span class="language-flag flag-'+l.flag+'"></span><span class="language-label">'+l.label+'</span><span class="language-chevron">⌄</span></button><div class="language-menu" id="languageMenu" role="menu" aria-hidden="true">'+Object.entries(TATTOOUI_LANGUAGES).filter(([code])=>code!==currentLanguage).map(([code,x])=>'<button type="button" class="language-option" onclick="setLanguage(\''+code+'\')" role="menuitem"><span class="language-flag flag-'+x.flag+'"></span><span>'+x.label+'</span></button>').join('')+'</div></div>';
 }
 function toggleLanguageMenu(event){
@@ -325,7 +330,7 @@ function translateString(value){
   return Object.prototype.hasOwnProperty.call(dict,value)?dict[value]:value;
 }
 function applyLanguage(){
-  const meta=TATTOOUI_LANGUAGES[currentLanguage]||TATTOOUI_LANGUAGES.en;
+  const meta=TATTOOUI_LANGUAGES[currentLanguage]||TATTOOUI_LANGUAGES.fr;
   document.documentElement.lang=currentLanguage;
   document.documentElement.dir=meta.dir;
   document.body.classList.remove("lang-en","lang-fr","lang-ar");
@@ -617,7 +622,7 @@ function hydrateDeferredStory(){
     observer.observe(story);
   }else load();
 }
-function render(){const path=location.hash.replace(/^#/,"")||"/";const checkoutRoute=path==="/checkout"||path.startsWith("/order-confirmed/");currentLanguage=checkoutRoute?"ar":(localStorage.getItem("tattooui-language")||"en");let app=document.getElementById("app");if(path.startsWith("/product/")){const p=products.find(x=>x.id===Number(path.split("/")[2]));app.innerHTML=p?productView(p):homeView();if(p&&p.dbId)metaTrack("ViewContent",{content_ids:[String(p.dbId)],content_type:"product",content_name:p.name,value:Number(p.price),currency:"MAD"})}else if(path==="/checkout"){app.innerHTML=checkoutView()}else if(path.startsWith("/order-confirmed/")){app.innerHTML=confirmationView(path.split("/")[2]||"")}else if(["/privacy","/terms","/returns","/shipping","/contact"].includes(path)){app.innerHTML=legalView(path.slice(1))}else app.innerHTML=homeView();applyLanguage();updateBadge();renderCart();hydrateDeferredStory()}
+function render(){const path=location.hash.replace(/^#/,"")||"/";currentLanguage=localStorage.getItem("tattooui-language")||"fr";let app=document.getElementById("app");if(path.startsWith("/product/")){const p=products.find(x=>x.id===Number(path.split("/")[2]));app.innerHTML=p?productView(p):homeView();if(p&&p.dbId)metaTrack("ViewContent",{content_ids:[String(p.dbId)],content_type:"product",content_name:p.name,value:Number(p.price),currency:"MAD"})}else if(path==="/checkout"){app.innerHTML=checkoutView()}else if(path.startsWith("/order-confirmed/")){app.innerHTML=confirmationView(path.split("/")[2]||"")}else if(["/privacy","/terms","/returns","/shipping","/contact"].includes(path)){app.innerHTML=legalView(path.slice(1))}else app.innerHTML=homeView();applyLanguage();updateBadge();renderCart();hydrateDeferredStory()}
 function updateSEO(){
   const path=location.hash.replace(/^#/,"")||"/";
   const base="https://tattooui.com";
