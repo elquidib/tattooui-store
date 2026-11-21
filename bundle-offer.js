@@ -183,6 +183,7 @@
       document.getElementById("cartSubtotal").textContent = money(0);
       const se = document.getElementById("cart-shipping"); if (se) se.outerHTML = deliveryMarkup(0, "cart-shipping");
       const dl = document.getElementById("cartDeliveryLabel"); if (dl) dl.textContent = deliveryLabels().delivery;
+      const nudge = document.getElementById("cartFreeDeliveryNudge"); if (nudge) nudge.innerHTML = "";
       return;
     }
     let subtotal = 0;
@@ -200,6 +201,7 @@
     document.getElementById("cartSubtotal").textContent = money(subtotal);
     const se = document.getElementById("cart-shipping"); if (se) se.outerHTML = deliveryMarkup(subtotal, "cart-shipping");
     const dl = document.getElementById("cartDeliveryLabel"); if (dl) dl.textContent = deliveryLabels().delivery;
+    const nudge = document.getElementById("cartFreeDeliveryNudge"); if (nudge) nudge.innerHTML = freeDeliveryNudgeMarkup(subtotal, "cart-free-delivery-progress");
     box.scrollTop = savedScroll;
   };
 
