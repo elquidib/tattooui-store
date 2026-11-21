@@ -169,26 +169,50 @@ body.cart-open .language-switcher{display:none!important}
   const status=document.getElementById("tattoouiMusicStatus");
   if(!audio||!toggle||!player||!volume||!status)return;
   audio.volume=0.18;
+  let visitorPaused=false;
   const paint=()=>{
     const playing=!audio.paused;
     toggle.textContent=playing?"Ⅱ":"♫";
     toggle.setAttribute("aria-label",playing?"Pause background music":"Play background music");
     toggle.setAttribute("aria-pressed",String(playing));
     toggle.title=playing?"Pause music":"Play music";
-    status.textContent=playing?"Now playing":"Music paused";
+    if(playing)status.textContent="Now playing";
+    else if(visitorPaused)status.textContent="Music paused";
+  };
+  const startMusic=async()=>{
+    if(visitorPaused||!audio.paused)return;
+    try{
+      await audio.play();
+      status.textContent="Now playing";
+    }catch(error){
+      status.textContent="Tap anywhere to start music";
+      console.info("TATTO✦OUI: browser blocked audible autoplay; waiting for visitor interaction.");
+    }
+    paint();
   };
   toggle.addEventListener("click",async()=>{
     player.classList.add("tm-open");
     if(audio.paused){
+      visitorPaused=false;
       try{await audio.play();}catch(error){status.textContent="Tap to try playing";console.warn("TATTO✦OUI music playback failed:",error);}
-    }else audio.pause();
+    }else{
+      visitorPaused=true;
+      audio.pause();
+    }
     paint();
   });
   volume.addEventListener("input",()=>{audio.volume=Number(volume.value);});
   audio.addEventListener("play",paint);
   audio.addEventListener("pause",paint);
   audio.addEventListener("error",()=>{status.textContent="Music unavailable";});
+  document.addEventListener("pointerdown",()=>{
+    if(audio.paused&&!visitorPaused)startMusic();
+  },{once:true,capture:true});
+  document.addEventListener("keydown",()=>{
+    if(audio.paused&&!visitorPaused)startMusic();
+  },{once:true,capture:true});
   paint();
+  startMusic();
 })();
 </script>
 
