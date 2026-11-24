@@ -1,4 +1,6 @@
 User-agent: *
-Allow: /\nDisallow: /admin/\nDisallow: /staff/
+Allow: /
+Disallow: /admin/
+Disallow: /staff/
 
 Sitemap: https://tattooui.com/sitemap.xml
