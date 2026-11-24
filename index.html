@@ -168,6 +168,12 @@ html{scroll-behavior:smooth;scroll-padding-top:92px}
 @media(max-width:800px){.hero{min-height:min(720px,78svh)}.hero:before{background:linear-gradient(0deg,rgba(8,8,8,.78),rgba(8,8,8,.14) 85%)}.hero-inner{align-self:end;padding:70px 20px 52px}.hero h1{font-size:clamp(52px,15vw,82px)}.section{padding-block:54px}.grid{gap:12px}.card-media{border-radius:13px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero-media img,.hero-inner{animation:none}.card-media img,.story-visual,.btn,.iconbtn{transition:none}.card:hover .card-media img,.story:hover .story-visual{transform:none}#tattoouiMusic .tm-toggle[aria-pressed="true"]:after{animation:none}}
 </style>
+<style id="tattooui-2027-scroll-reveal">
+#homeView .motion-reveal{opacity:0;transform:translateY(24px);transition:opacity .72s cubic-bezier(.22,.68,0,1.02),transform .72s cubic-bezier(.22,.68,0,1.02)}
+#homeView .motion-reveal.is-visible{opacity:1;transform:none}
+#homeView .card.motion-reveal{transition-delay:var(--motion-delay,0ms)}
+@media(prefers-reduced-motion:reduce){#homeView .motion-reveal,#homeView .motion-reveal.is-visible{opacity:1;transform:none;transition:none}}
+</style>
 </head>
 <body>
 <div id="app"><div role="status" aria-live="polite" style="min-height:100vh;display:grid;place-items:center;background:#f5f3ee;color:#151515;font:14px Inter,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif"><div style="text-align:center;padding:24px"><div style="font-size:24px;font-weight:800;letter-spacing:.12em">TATTO<span style="color:#a7a29a">✦</span>OUI</div><div style="margin-top:12px;color:#77736c">Loading your store…</div><div style="margin:18px auto 0;width:24px;height:24px;border:2px solid #ddd7cd;border-top-color:#151515;border-radius:50%;animation:tattooui-load-spin .8s linear infinite"></div></div></div><style>@keyframes tattooui-load-spin{to{transform:rotate(360deg)}}</style></div>
@@ -736,7 +742,16 @@ function hydrateDeferredStory(){
     observer.observe(story);
   }else load();
 }
-function render(){const path=location.hash.replace(/^#/,"")||"/";currentLanguage=localStorage.getItem("tattooui-language")||"fr";let app=document.getElementById("app");if(path.startsWith("/product/")){const p=products.find(x=>x.id===Number(path.split("/")[2]));app.innerHTML=p?productView(p):homeView();if(p&&p.dbId)metaTrack("ViewContent",{content_ids:[String(p.dbId)],content_type:"product",content_name:p.name,value:Number(p.price),currency:"MAD"})}else if(path==="/checkout"){app.innerHTML=checkoutView()}else if(path.startsWith("/order-confirmed/")){app.innerHTML=confirmationView(path.split("/")[2]||"")}else if(["/privacy","/terms","/returns","/shipping","/contact"].includes(path)){app.innerHTML=legalView(path.slice(1))}else app.innerHTML=homeView();applyLanguage();updateBadge();renderCart();hydrateDeferredStory()}
+function initTattooMotion(){
+ const root=document.getElementById("homeView");
+ if(!root||window.matchMedia?.("(prefers-reduced-motion: reduce)").matches||!("IntersectionObserver" in window))return;
+ if(window.__tattooMotionObserver)window.__tattooMotionObserver.disconnect();
+ const targets=[...root.querySelectorAll(".trust,.section-head,.section,.story,.how-step,.review,.card")];
+ const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("is-visible");observer.unobserve(entry.target)}}),{threshold:.08,rootMargin:"0px 0px -32px 0px"});
+ window.__tattooMotionObserver=observer;
+ targets.forEach((el,i)=>{if(el.getBoundingClientRect().top>window.innerHeight*.88){el.classList.add("motion-reveal");if(el.classList.contains("card"))el.style.setProperty("--motion-delay",Math.min(i%4,3)*55+"ms");observer.observe(el)}});
+}
+function render(){const path=location.hash.replace(/^#/,"")||"/";currentLanguage=localStorage.getItem("tattooui-language")||"fr";let app=document.getElementById("app");if(path.startsWith("/product/")){const p=products.find(x=>x.id===Number(path.split("/")[2]));app.innerHTML=p?productView(p):homeView();if(p&&p.dbId)metaTrack("ViewContent",{content_ids:[String(p.dbId)],content_type:"product",content_name:p.name,value:Number(p.price),currency:"MAD"})}else if(path==="/checkout"){app.innerHTML=checkoutView()}else if(path.startsWith("/order-confirmed/")){app.innerHTML=confirmationView(path.split("/")[2]||"")}else if(["/privacy","/terms","/returns","/shipping","/contact"].includes(path)){app.innerHTML=legalView(path.slice(1))}else app.innerHTML=homeView();applyLanguage();updateBadge();renderCart();hydrateDeferredStory();initTattooMotion()}
 function updateSEO(){
   const path=location.hash.replace(/^#/,"")||"/";
   const base="https://tattooui.com";
