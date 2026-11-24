@@ -11,4 +11,16 @@
   Cache-Control: public, max-age=86400
 
 /sitemap.xml
-  Cache-Control: public, max-age=86400\n\n/\n  Cache-Control: no-store\n\n/index.html\n  Cache-Control: no-store\n\n/admin/*\n  Cache-Control: no-store\n\n/staff/*\n  Cache-Control: no-store\n
+  Cache-Control: public, max-age=86400
+
+/
+  Cache-Control: no-store
+
+/index.html
+  Cache-Control: no-store
+
+/admin/*
+  Cache-Control: no-store
+
+/staff/*
+  Cache-Control: no-store
