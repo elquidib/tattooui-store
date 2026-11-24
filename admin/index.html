@@ -422,10 +422,14 @@ async function markOrdersPrinted(orderIds){
  const ids=[...new Set((orderIds||[]).filter(Boolean))];
  if(!ids.length)return false;
  const printedAt=new Date().toISOString();
- const result=await db.from('orders').update({printed_at:printedAt}).in('id',ids).select('id');
+ const result=await db.from('orders').update({printed_at:printedAt}).in('id',ids).is('printed_at',null).select('id');
  if(result.error){alert('Could not save printed status: '+result.error.message);return false}
  const updated=result.data?.length||0;
- if(!updated){alert('No orders were updated. Check your admin permissions and refresh.');return false}
+ if(!updated){
+  const allAlreadyPrinted=ids.every(id=>orders.some(o=>o.id===id&&o.printed_at));
+  if(allAlreadyPrinted){alert('These orders are already marked as printed.');return true}
+  alert('No orders were updated. Check your admin permissions and refresh.');return false
+ }
  ids.forEach(id=>selectedPrintOrderIds.delete(id));
  await loadOrders();
  alert('Saved: '+updated+' order(s) marked as printed.');
