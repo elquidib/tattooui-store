@@ -917,6 +917,15 @@ function updateSEO(){
 }document.addEventListener("blur",e=>{if(e.target?.matches?.('input[name="phone"]'))(normalizeMoroccanPhone(e.target.value)&&(e.target.value=normalizeMoroccanPhone(e.target.value)),validateCheckoutPhone(e.target,false))},true);document.addEventListener("input",e=>{if(e.target?.matches?.('input[name="phone"]')){if(isValidMoroccanPhone(e.target.value))setPhoneFieldError(e.target,false);else if(!String(e.target.value||"").trim())setPhoneFieldError(e.target,false)}});window.addEventListener("hashchange",()=>{resetTurnstile();render();updateSEO();if(location.hash==="#/checkout")setTimeout(renderTurnstile,120)});restoreStorefrontCache();document.addEventListener("click",e=>{if(!e.target.closest(".language-switcher"))closeLanguageMenu()});window.addEventListener("scroll",()=>{const b=document.getElementById("backtop");if(b)b.classList.toggle("show",scrollY>600)});syncStorefrontProductImages().then(()=>updateSEO());setTimeout(renderTurnstile,500);
 </script>
 <script src="/bundle-offer.js?v=20261111-cart-arabic-v2" defer></script>
+
+<style id="tattooui-mobile-purchase-duplication-fix">
+/* Fix duplicated product purchase controls on mobile: keep the sticky bar for regular products, while preserving bundle offer cards. */
+@media (max-width:700px){
+  .product-page .product-layout > div:last-child > .purchase-area:not(:has(.bundle-offers)){
+    display:none!important;
+  }
+}
+</style>
 </body>
 </html>
 
