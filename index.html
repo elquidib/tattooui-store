@@ -393,25 +393,39 @@ body{background:var(--paper)}
   document.addEventListener("keydown",()=>{
     if(audio.paused&&!visitorPaused)startMusic();
   },{once:true,capture:true});
-  // Stop audio whenever the visitor leaves this page/app view (Instagram browser, tab switch, etc.).
-  let resumeAfterLeave=false;
-  const stopWhenHidden=()=>{
-    if(document.visibilityState==="hidden"){
-      resumeAfterLeave=!audio.paused&&!visitorPaused;
-      audio.pause();
-    }else if(document.visibilityState==="visible"&&resumeAfterLeave&&!visitorPaused){
-      resumeAfterLeave=false;
-      startMusic();
-    }
-  };
-  document.addEventListener("visibilitychange",stopWhenHidden);
-  window.addEventListener("pagehide",()=>{
-    resumeAfterLeave=!audio.paused&&!visitorPaused;
+  // Leaving the page is a hard stop. Never auto-resume on pageshow/visibility return.
+  // In-app browsers may suspend a WebView without a normal navigation, so use several lifecycle signals.
+  let stoppedAfterLeave=false;
+  const stopForExit=()=>{
+    stoppedAfterLeave=true;
     audio.pause();
-  });
+    try{audio.currentTime=0;}catch(e){}
+    try{
+      if("mediaSession" in navigator){
+        navigator.mediaSession.playbackState="paused";
+        navigator.mediaSession.setActionHandler("play",null);
+        navigator.mediaSession.setActionHandler("pause",null);
+      }
+    }catch(e){}
+    status.textContent="Music stopped";
+    paint();
+  };
+  document.addEventListener("visibilitychange",()=>{
+    if(document.visibilityState==="hidden")stopForExit();
+  },{capture:true});
+  window.addEventListener("pagehide",stopForExit,{capture:true});
+  window.addEventListener("beforeunload",stopForExit,{capture:true});
+  window.addEventListener("freeze",stopForExit,{capture:true});
+  window.addEventListener("blur",()=>{
+    // A focus loss is a useful extra signal for mobile app-switching; avoid restarting when focus returns.
+    if(document.visibilityState!=="visible")stopForExit();
+  },{capture:true});
   window.addEventListener("pageshow",()=>{
-    if(resumeAfterLeave&&!visitorPaused){resumeAfterLeave=false;startMusic();}
-  });
+    // BFCache restore: remain stopped after a previous leave.
+    if(stoppedAfterLeave){audio.pause();paint();}
+  },{capture:true});
+  // If the page starts hidden (e.g. an ad opens it in a background view), do not begin audio.
+  if(document.visibilityState==="hidden")stopForExit();
   paint();
   startMusic();
 })();
