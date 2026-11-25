@@ -127,9 +127,12 @@ Deno.serve(async req=>{
     allFollowups.push(...(followups.data||[]));
     allActions.push(...(actions.data||[]));
    }
-   const {data:products,error:productsError}=await db.from("products").select("id,name,price,stock").eq("status","active").order("name");
-   if(productsError)throw productsError;
-   return json({orders:orders||[],items:allItems,followups:allFollowups,actions:allActions,products:products||[],staff:session.account});
+   const [{data:products,error:productsError},{data:settings,error:settingsError}]=await Promise.all([
+    db.from("products").select("id,name,price,stock").eq("status","active").order("name"),
+    db.from("site_settings").select("shipping_fee").limit(1).maybeSingle()
+   ]);
+   if(productsError)throw productsError;if(settingsError)throw settingsError;
+   return json({orders:orders||[],items:allItems,followups:allFollowups,actions:allActions,products:products||[],shipping_fee:Number(settings?.shipping_fee??35),staff:session.account});
   }
   if(action==="mark_call_later"){
    const id=String(body.order_id||"");const {data:o,error}=await db.from("orders").select("id,status").eq("id",id).maybeSingle();
