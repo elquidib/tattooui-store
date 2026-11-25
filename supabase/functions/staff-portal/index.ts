@@ -154,5 +154,19 @@ Deno.serve(async req=>{
    return json({ok:true});
   }
   return json({error:"Unknown action"},400);
- }catch(e){console.error("staff-api",e);return json({error:"وقع مشكل غير متوقع. عاودي المحاولة."},500);}
+ }catch(e){
+  console.error("staff-api",e);
+  const raw=String((e as any)?.message||"");
+  const known=[
+   "اسم الزبون غير صحيح","المدينة غير صحيحة","العنوان غير صحيح","الملاحظات طويلة بزاف",
+   "ثمن التوصيل غير صحيح","خاص الطلب يحتوي على منتج واحد على الأقل",
+   "رقم الهاتف خاصو يكون رقم مغربي صحيح يبدأ بـ 06 أو 07",
+   "الكمية خاصها تكون بين 1 و99","ثمن المنتج غير صحيح","اسم المنتج غير صحيح",
+   "عنصر من الطلب غير صحيح","المخزون لا يكفي لزيادة الكمية","المخزون لا يكفي للمنتج المضاف",
+   "اختاري المنتج المضاف","الطلب غير موجود"
+  ];
+  if(known.includes(raw))return json({error:raw},400);
+  if(raw.includes("orders_phone_moroccan_local_chk")||raw.includes("customers_phone_moroccan_local_chk")||raw.includes("customers_phone_normalized_moroccan_local_chk"))return json({error:"رقم الهاتف خاصو يكون بصيغة مغربية صحيحة: 06 أو 07."},400);
+  return json({error:"تعذر حفظ التعديل. تأكدي من المعلومات وحاولي مرة أخرى."},500);
+ }
 });
