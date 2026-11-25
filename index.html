@@ -363,7 +363,7 @@ body{background:var(--paper)}
     else if(visitorPaused)status.textContent="Music paused";
   };
   const startMusic=async()=>{
-    if(visitorPaused||!audio.paused)return;
+    if(visitorPaused||stoppedAfterLeave||!audio.paused)return;
     try{
       await audio.play();
       status.textContent="Now playing";
@@ -377,6 +377,7 @@ body{background:var(--paper)}
     player.classList.add("tm-open");
     if(audio.paused){
       visitorPaused=false;
+      stoppedAfterLeave=false; // Explicit visitor tap may restart music on this page.
       try{await audio.play();}catch(error){status.textContent="Tap to try playing";console.warn("TATTO✦OUI music playback failed:",error);}
     }else{
       visitorPaused=true;
