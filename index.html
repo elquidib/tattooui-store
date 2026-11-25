@@ -417,10 +417,7 @@ body{background:var(--paper)}
   window.addEventListener("pagehide",stopForExit,{capture:true});
   window.addEventListener("beforeunload",stopForExit,{capture:true});
   window.addEventListener("freeze",stopForExit,{capture:true});
-  window.addEventListener("blur",()=>{
-    // A focus loss is a useful extra signal for mobile app-switching; avoid restarting when focus returns.
-    if(document.visibilityState!=="visible")stopForExit();
-  },{capture:true});
+  window.addEventListener("blur",stopForExit,{capture:true});
   window.addEventListener("pageshow",()=>{
     // BFCache restore: remain stopped after a previous leave.
     if(stoppedAfterLeave){audio.pause();paint();}
