@@ -351,6 +351,13 @@ body{background:var(--paper)}
   const player=document.getElementById("tattoouiMusic");
   const status=document.getElementById("tattoouiMusicStatus");
   if(!audio||!toggle||!player||!status)return;
+  const musicSource=audio.querySelector("source");
+  const musicSourceUrl=musicSource?.getAttribute("src")||audio.getAttribute("src")||"";
+  const restoreMusicSource=()=>{
+    if(musicSource&&musicSourceUrl&&!musicSource.getAttribute("src"))musicSource.setAttribute("src",musicSourceUrl);
+    if(!musicSource&&musicSourceUrl&&!audio.getAttribute("src"))audio.setAttribute("src",musicSourceUrl);
+    audio.load();
+  };
   audio.volume=0.18;
   let visitorPaused=false;
   const paint=()=>{
@@ -378,6 +385,7 @@ body{background:var(--paper)}
     if(audio.paused){
       visitorPaused=false;
       stoppedAfterLeave=false; // Explicit visitor tap may restart music on this page.
+      restoreMusicSource();
       try{await audio.play();}catch(error){status.textContent="Tap to try playing";console.warn("TATTO✦OUI music playback failed:",error);}
     }else{
       visitorPaused=true;
@@ -401,6 +409,8 @@ body{background:var(--paper)}
     stoppedAfterLeave=true;
     audio.pause();
     try{audio.currentTime=0;}catch(e){}
+    // Tear down the media source as well as pausing it to release the native player in mobile WebViews.
+    try{if(musicSource)musicSource.removeAttribute("src");else audio.removeAttribute("src");audio.load();}catch(e){}
     try{
       if("mediaSession" in navigator){
         navigator.mediaSession.playbackState="paused";
