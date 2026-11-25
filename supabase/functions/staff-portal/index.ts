@@ -85,16 +85,13 @@ Deno.serve(async req=>{
   }
   const session=await staffSession(req);if(!session)return json({error:"انتهت الجلسة. سجّلي الدخول من جديد."},401);
   if(action==="edit_order"){
-   const id=String(body.order_id||""),customerName=String(body.customer_name||"").trim(),city=String(body.city||"").trim(),address=String(body.address||"").trim();
+   const id=String(body.order_id||"");
    if(!/^[0-9a-f-]{36}$/i.test(id))return json({error:"معرّف الطلب غير صحيح."},400);
-   if(!customerName||customerName.length>120||!city||city.length>120||!address||address.length>500)return json({error:"يرجى إدخال الاسم والمدينة والعنوان بشكل صحيح."},400);
-   const {data:before,error:readError}=await db.from("orders").select("id,customer_name,city,address").eq("id",id).maybeSingle();
-   if(readError)throw readError;if(!before)return json({error:"الطلب غير موجود."},404);
-   const {error}=await db.from("orders").update({customer_name:customerName,city,address,updated_at:new Date().toISOString()}).eq("id",id);
+   const items=Array.isArray(body.items)?body.items:[];
+   const payload={p_order_id:id,p_staff_id:session.account.id,p_customer_name:String(body.customer_name||""),p_phone:String(body.phone||""),p_city:String(body.city||""),p_address:String(body.address||""),p_notes:String(body.notes||""),p_shipping:Number(body.shipping),p_items:items};
+   const {data,error}=await db.rpc("staff_edit_order_full",payload);
    if(error)throw error;
-   const audit=await db.from("staff_order_actions").insert({order_id:id,staff_id:session.account.id,action_type:"edited"});
-   if(audit.error)throw audit.error;
-   return json({ok:true});
+   return json(data||{ok:true});
   }
   if(action==="list_orders"){
    // Load every order in stable pages so repeat-customer counts never silently stop at 250.
@@ -119,7 +116,7 @@ Deno.serve(async req=>{
    for(let i=0;i<ids.length;i+=idBatchSize){
     const batch=ids.slice(i,i+idBatchSize);
     const [items,followups,actions]=await Promise.all([
-     db.from("order_items").select("order_id,product_name,quantity,line_total").in("order_id",batch),
+     db.from("order_items").select("id,order_id,product_id,product_name,unit_price,quantity,line_total").in("order_id",batch),
      db.from("staff_order_followups").select("order_id,updated_at").in("order_id",batch),
      db.from("staff_order_actions").select("order_id,action_type,created_at").in("order_id",batch).order("created_at",{ascending:false})
     ]);
@@ -130,7 +127,9 @@ Deno.serve(async req=>{
     allFollowups.push(...(followups.data||[]));
     allActions.push(...(actions.data||[]));
    }
-   return json({orders:orders||[],items:allItems,followups:allFollowups,actions:allActions,staff:session.account});
+   const {data:products,error:productsError}=await db.from("products").select("id,name,price,stock").eq("status","active").order("name");
+   if(productsError)throw productsError;
+   return json({orders:orders||[],items:allItems,followups:allFollowups,actions:allActions,products:products||[],staff:session.account});
   }
   if(action==="mark_call_later"){
    const id=String(body.order_id||"");const {data:o,error}=await db.from("orders").select("id,status").eq("id",id).maybeSingle();
